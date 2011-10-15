@@ -5,6 +5,8 @@ http://tools.ietf.org/html/draft-pbryan-json-patch-01
 
 Note: all operations are applied in-place.
 
+View tests and litmus: http://bruth.github.com/jsonpatch-js/
+
 Add
 ---
 Patch syntax: ``{add: <path>, value: <value>}``
