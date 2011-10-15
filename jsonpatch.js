@@ -1,11 +1,27 @@
-var jsonpatch = (function() {
+// jsonpatch.js 0.1
+// (c) 2011 Byron Ruth
+// jsonpatch may be freely distributed under the MIT license
+
+// Run-anywhere Javascript Boilerplate Code
+// http://www.sitepen.com/blog/2010/09/30/run-anywhere-javascript-modules-boilerplate-code/
+(function(name, factory) {
+    typeof required == 'undefined' ?
+        (typeof dojo != 'undefined' && dojo.provide(name)) &
+            // direct script
+            factory(this[name] = {}) :
+        typeof exports == 'undefined' ?
+            // browser transport/C loader or RequireJS
+            define(name, ['exports'], factory) :
+            // CommonJS environment
+            factory(exports);
+})('jsonpatch', function(exports) {
 
     var toString = Object.prototype.toString,
 
         isArray = Array.isArray || function(obj) {
             return toString.call(obj) === '[object Array]';
         },
- 
+
         isObject = function(obj) {
             return obj === Object(obj);
         },
@@ -153,10 +169,8 @@ var jsonpatch = (function() {
         return obj;
     }
 
-    return {
-        apply: apply,
-        PatchApplyError: PatchApplyError,
-        PatchConflictError: PatchConflictError
-    }
-
-})();
+    // expose to exports
+    exports.apply = apply;
+    exports.PatchApplyError = PatchApplyError;
+    exports.PatchConflictError = PatchConflictError;
+});
