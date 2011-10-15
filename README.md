@@ -3,9 +3,13 @@ jsonpatch.js
 Library to apply JSON Patches in JavaScript
 http://tools.ietf.org/html/draft-pbryan-json-patch-01
 
-Note: all operations are applied in-place.
-
 View tests and litmus: http://bruth.github.com/jsonpatch-js/
+
+For convenience, ``jsonpatch.apply`` can take a patch as an object
+or an array of objects. The spec states the latter as being the official
+patch syntax.
+
+Note: all operations are applied in-place.
 
 Add
 ---
