@@ -71,3 +71,18 @@ JSLitmus.test('Replace Operation', function() {
     var obj = {foo: 1, baz: [{qux: 'hello'}]};
     jsonpatch.apply(obj, [{replace: '/foo', value: [1, 2, 3, 4]}]);
 });
+
+JSLitmus.test('@dharmafly - Add Operation', function() {
+    var obj = {foo: 1, baz: [{qux: 'hello'}]};
+    djsonpatch.apply_patch(obj, [{add: '/bar', value: [1, 2, 3, 4]}]);
+});
+
+JSLitmus.test('@dharmafly - Remove Operation', function() {
+    var obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
+    djsonpatch.apply_patch(obj, [{remove: '/bar'}]);
+});
+
+JSLitmus.test('@dharmafly - Replace Operation', function() {
+    var obj = {foo: 1, baz: [{qux: 'hello'}]};
+    djsonpatch.apply_patch(obj, [{replace: '/foo', value: [1, 2, 3, 4]}]);
+});
