@@ -1,7 +1,7 @@
 jsonpatch.js
 ============
 Library to apply JSON Patches in JavaScript
-http://tools.ietf.org/html/draft-pbryan-json-patch-01
+http://tools.ietf.org/html/draft-pbryan-json-patch-04
 
 View tests and litmus: http://bruth.github.com/jsonpatch-js/
 
@@ -42,7 +42,7 @@ jsonpatch.apply({foo: [{bar: 'baz'}]}, [{remove: '/foo/0/bar'}]);
 ```
 
 Replace
-------
+-------
 Patch syntax: ``{replace: <path>, value: <value>}``
 
 ```javascript
@@ -54,4 +54,22 @@ jsonpatch.apply({foo: [1, 2, 3]}, [{replace: '/foo/1', value: 4}]);
 
 // Complex, result: {foo: [{bar: 1}]}
 jsonpatch.apply({foo: [{bar: 'baz'}]}, [{replace: '/foo/0/bar', value: 1}]);
+```
+
+Move
+----
+Patch syntax: ``{move: <path>, to: <path>}``
+
+```javascript
+// Move property, result {bar: [1, 2, 3]}
+jsonpatch.apply({foo: [1, 2, 3]}, [{move: '/foo', to: '/bar'}]);
+```
+
+Test
+----
+Patch syntax: ``{test: <path>, value: <value>}``
+
+```javascript
+// Test property, result: true
+jsonpatch.apply({foo: 'bar'}, [{test: '/foo', value: 'bar'}]
 ```
