@@ -22,8 +22,8 @@
 
     # Define a few helper functions taken from the awesome underscore library
     isArray = (obj) -> toString.call(obj) is '[object Array]'
-    isObject = (obj) -> obj is Object(obj)
-    isString = (obj) -> !!(obj is '' or (obj and obj.charCodeAt and obj.substr))
+    isObject = (obj) -> toString.call(obj) is '[object Object]'
+    isString = (obj) -> toString.call(obj) is '[object String]'
 
     # Limited Underscore.js implementation, internal recursive comparison function.
     _isEqual = (a, b, stack) ->
@@ -106,7 +106,6 @@
     isEqual = (a, b) -> _isEqual(a, b, [])
 
 
-
     # Various error constructors
     class JSONPatchError extends Error
         constructor: (message) ->
@@ -117,11 +116,6 @@
         constructor: (message) ->
             @name = 'InvalidPatch'
             @message = message or 'Invalid patch'
-
-    class PatchApplyError extends JSONPatchError
-        constructor: (message) ->
-            @name = 'PatchApplyError'
-            @message = message or 'Patch could not be applied'
 
     class PatchConflictError extends JSONPatchError
         constructor: (message) ->
@@ -170,7 +164,11 @@
                 @operation = methodMap[key]
                 # This will always be a pointer
                 @pointer = new JSONPointer(patch[key])
-                @supplement = patch[member]
+
+                supp = patch[member]
+                if (preproc = memberProcessors[key])
+                    supp = preproc(supp)
+                @supplement = supp
 
             if not @operation then throw new InvalidPatchError()
 
@@ -248,7 +246,6 @@
             value = obj[acc]
             delete obj[acc]
 
-        to = new JSONPointer(to)
         obj = to.getObject(root)
         acc = to.accessor
 
@@ -281,6 +278,10 @@
         test: 'value'
         move: 'to'
 
+    # Map of operation member pre-processors
+    memberProcessors =
+        move: (to) -> new JSONPointer(to)
+
     apply = (root, patchDocument) ->
         compile(patchDocument)(root)
 
@@ -296,5 +297,6 @@
 
     exports.apply = apply
     exports.compile = compile
-    exports.PatchApplyError = PatchApplyError
+    exports.JSONPatchError = JSONPatchError
+    exports.InvalidPatchError = InvalidPatchError
     exports.PatchConflictError = PatchConflictError

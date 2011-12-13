@@ -10,17 +10,17 @@
       return factory(exports);
     }
   })('jsonpatch', function(exports) {
-    var InvalidPatchError, JSONPatch, JSONPatchError, JSONPointer, PatchApplyError, PatchConflictError, add, apply, compile, hasOwnProperty, isArray, isEqual, isObject, isString, methodMap, move, operationMembers, remove, replace, test, toString, _isEqual;
+    var InvalidPatchError, JSONPatch, JSONPatchError, JSONPointer, PatchConflictError, add, apply, compile, hasOwnProperty, isArray, isEqual, isObject, isString, memberProcessors, methodMap, move, operationMembers, remove, replace, test, toString, _isEqual;
     toString = Object.prototype.toString;
     hasOwnProperty = Object.prototype.hasOwnProperty;
     isArray = function(obj) {
       return toString.call(obj) === '[object Array]';
     };
     isObject = function(obj) {
-      return obj === Object(obj);
+      return toString.call(obj) === '[object Object]';
     };
     isString = function(obj) {
-      return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
+      return toString.call(obj) === '[object String]';
     };
     _isEqual = function(a, b, stack) {
       var className, key, length, result, size;
@@ -115,18 +115,6 @@
       return InvalidPatchError;
 
     })();
-    PatchApplyError = (function() {
-
-      __extends(PatchApplyError, JSONPatchError);
-
-      function PatchApplyError(message) {
-        this.name = 'PatchApplyError';
-        this.message = message || 'Patch could not be applied';
-      }
-
-      return PatchApplyError;
-
-    })();
     PatchConflictError = (function() {
 
       __extends(PatchConflictError, JSONPatchError);
@@ -175,7 +163,7 @@
     JSONPatch = (function() {
 
       function JSONPatch(patch) {
-        var key, member, method;
+        var key, member, method, preproc, supp;
         for (key in patch) {
           if (!(method = methodMap[key])) continue;
           if (this.operation) throw new InvalidPatchError();
@@ -184,7 +172,9 @@
           }
           this.operation = methodMap[key];
           this.pointer = new JSONPointer(patch[key]);
-          this.supplement = patch[member];
+          supp = patch[member];
+          if ((preproc = memberProcessors[key])) supp = preproc(supp);
+          this.supplement = supp;
         }
         if (!this.operation) throw new InvalidPatchError();
       }
@@ -271,7 +261,6 @@
         value = obj[acc];
         delete obj[acc];
       }
-      to = new JSONPointer(to);
       obj = to.getObject(root);
       acc = to.accessor;
       if (isArray(obj)) {
@@ -301,6 +290,11 @@
       test: 'value',
       move: 'to'
     };
+    memberProcessors = {
+      move: function(to) {
+        return new JSONPointer(to);
+      }
+    };
     apply = function(root, patchDocument) {
       return compile(patchDocument)(root);
     };
@@ -322,7 +316,8 @@
     };
     exports.apply = apply;
     exports.compile = compile;
-    exports.PatchApplyError = PatchApplyError;
+    exports.JSONPatchError = JSONPatchError;
+    exports.InvalidPatchError = InvalidPatchError;
     return exports.PatchConflictError = PatchConflictError;
   });
 
