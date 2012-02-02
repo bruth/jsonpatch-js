@@ -167,7 +167,7 @@
         for (key in patch) {
           if (!(method = methodMap[key])) continue;
           if (this.operation) throw new InvalidPatchError();
-          if ((member = operationMembers[key]) && !patch[member]) {
+          if ((member = operationMembers[key]) && patch[member] === undefined) {
             throw new InvalidPatchError("Patch member " + member + " not defined");
           }
           this.operation = methodMap[key];

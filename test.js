@@ -27,6 +27,22 @@ test('add', function() {
     raises(function() {
         jsonpatch.apply(obj, [{add: '/bar/-1', value: '5'}]);
     }, jsonpatch.PatchConflictError, 'Out of bounds (lower)');
+
+    raises(function() {
+        jsonpatch.apply(obj, [{add: '/bar/8', value: undefined}]);
+    }, jsonpatch.InvalidPatchError, 'Patch member value not defined');
+
+    obj = {foo: 1, baz: [{qux: 'hello'}]};
+    jsonpatch.apply(obj, [{add: '/bar', value: true}]);
+    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: true});
+
+    obj = {foo: 1, baz: [{qux: 'hello'}]};
+    jsonpatch.apply(obj, [{add: '/bar', value: false}]);
+    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: false});
+
+    obj = {foo: 1, baz: [{qux: 'hello'}]};
+    jsonpatch.apply(obj, [{add: '/bar', value: null}]);
+    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: null});
 });
 
 
