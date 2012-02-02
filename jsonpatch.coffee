@@ -157,7 +157,7 @@
                 # A patch operation has already been defined
                 if @operation then throw new InvalidPatchError()
                 # If a supplementary member is required (not null), ensure it exists
-                if (member = operationMembers[key]) and not patch[member]
+                if (member = operationMembers[key]) and patch[member] is undefined
                     throw new InvalidPatchError("Patch member #{member} not defined")
 
                 # Store reference to operation function

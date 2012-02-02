@@ -1,5 +1,7 @@
 (function() {
-  var __hasProp = Object.prototype.hasOwnProperty, __indexOf = Array.prototype.indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (__hasProp.call(this, i) && this[i] === item) return i; } return -1; }, __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+  var __indexOf = Array.prototype.indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   (function(name, factory) {
     if (typeof required === 'undefined') {
@@ -91,9 +93,9 @@
     isEqual = function(a, b) {
       return _isEqual(a, b, []);
     };
-    JSONPatchError = (function() {
+    JSONPatchError = (function(_super) {
 
-      __extends(JSONPatchError, Error);
+      __extends(JSONPatchError, _super);
 
       function JSONPatchError(message) {
         this.name = 'JSONPatchError';
@@ -102,10 +104,10 @@
 
       return JSONPatchError;
 
-    })();
-    InvalidPatchError = (function() {
+    })(Error);
+    InvalidPatchError = (function(_super) {
 
-      __extends(InvalidPatchError, JSONPatchError);
+      __extends(InvalidPatchError, _super);
 
       function InvalidPatchError(message) {
         this.name = 'InvalidPatch';
@@ -114,10 +116,10 @@
 
       return InvalidPatchError;
 
-    })();
-    PatchConflictError = (function() {
+    })(JSONPatchError);
+    PatchConflictError = (function(_super) {
 
-      __extends(PatchConflictError, JSONPatchError);
+      __extends(PatchConflictError, _super);
 
       function PatchConflictError(message) {
         this.name = 'PatchConflictError';
@@ -126,7 +128,7 @@
 
       return PatchConflictError;
 
-    })();
+    })(JSONPatchError);
     JSONPointer = (function() {
 
       function JSONPointer(path, shouldExist) {
@@ -167,7 +169,7 @@
         for (key in patch) {
           if (!(method = methodMap[key])) continue;
           if (this.operation) throw new InvalidPatchError();
-          if ((member = operationMembers[key]) && patch[member] === undefined) {
+          if ((member = operationMembers[key]) && patch[member] === void 0) {
             throw new InvalidPatchError("Patch member " + member + " not defined");
           }
           this.operation = methodMap[key];
