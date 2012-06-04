@@ -1,4 +1,4 @@
-# jsonpatch.js 0.2
+# jsonpatch.js 0.2.1
 # (c) 2011 Byron Ruth
 # jsonpatch may be freely distributed under the MIT license
 
@@ -239,7 +239,7 @@
             acc = parseInt(acc, 10)
             if not hasOwnProperty.call(obj, acc)
                 throw new PatchConflictError("Value at #{acc} does not exist")
-            value = obj.splice(acc, 1)
+            value = obj.splice(acc, 1)[0]
         else
             if not hasOwnProperty.call(obj, acc)
                 throw new PatchConflictError("Value at #{acc} does not exist")
