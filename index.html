@@ -1,22 +1,120 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="UTF-8" />
-	<title>QUnit Test Suite</title>
-	<link rel="stylesheet" href="qunit.css" type="text/css" media="screen">
-	<script type="text/javascript" src="qunit.js"></script>
-	<script type="text/javascript" src="dharmafly-jsonpatch.js"></script>
-    <script>var djsonpatch = jsonpatch;</script>
-	<script type="text/javascript" src="jsonpatch.js"></script>
-    <script type="text/javascript" src="jslitmus.js"></script>
-	<script type="text/javascript" src="test.js"></script>
-</head>
-<body>
-	<h1 id="qunit-header">QUnit Test Suite</h1>
-	<h2 id="qunit-banner"></h2>
-	<div id="qunit-testrunner-toolbar"></div>
-	<h2 id="qunit-userAgent"></h2>
-	<ol id="qunit-tests"></ol>
-	<div id="qunit-fixture"></div>
-</body>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>jsonpatch-js by bruth</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>jsonpatch-js</h1>
+        <h2>A JavaScript implementation of the JSON Media Type for partial modifications</h2>
+        <a href="https://github.com/bruth/jsonpatch-js" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h2>JSON Patch for JavaScript</h2>
+
+<p>Library to apply JSON Patches in JavaScript
+<a href="http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-02">http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-02</a></p>
+
+<p>For convenience, <code>jsonpatch.apply</code> can take a patch as an object
+or an array of objects. The spec states the latter as being the official
+patch syntax.</p>
+
+<p>Note: all operations are applied in-place.</p>
+
+<h3>Add</h3>
+
+<p>Patch syntax: <code>{add: &lt;path&gt;, value: &lt;value&gt;}</code></p>
+
+<div class="highlight"><pre><span class="c1">// Add property, result: {foo: 'bar'}</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({},</span> <span class="p">[{</span><span class="nx">add</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">}]);</span>
+
+<span class="c1">// Add array element, result: {foo: [1, 2, 3]}</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">add</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">2</span><span class="p">}]);</span>
+
+<span class="c1">// Complex, result: {foo: [{bar: 'baz'}]}</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{}]},</span> <span class="p">[{</span><span class="nx">add</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]);</span>
+</pre></div>
+
+<h3>Remove</h3>
+
+<p>Patch syntax: <code>{remove: &lt;path&gt;}</code></p>
+
+<div class="highlight"><pre><span class="c1">// Remove property, result: {}</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">remove</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">}]);</span>
+
+<span class="c1">// Remove array element, result: {foo: [1, 3]}</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">remove</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">}]);</span>
+
+<span class="c1">// Complex, result: {foo: [{}]}</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{</span><span class="nx">bar</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]},</span> <span class="p">[{</span><span class="nx">remove</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">}]);</span>
+</pre></div>
+
+<h3>Replace</h3>
+
+<p>Patch syntax: <code>{replace: &lt;path&gt;, value: &lt;value&gt;}</code></p>
+
+<div class="highlight"><pre><span class="c1">// Replace property, result: {foo: 1}</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">replace</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">1</span><span class="p">}]);</span>
+
+<span class="c1">// Repalce array element, result: {foo: [1, 4, 3]}</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">replace</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">4</span><span class="p">}]);</span>
+
+<span class="c1">// Complex, result: {foo: [{bar: 1}]}</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{</span><span class="nx">bar</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]},</span> <span class="p">[{</span><span class="nx">replace</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">1</span><span class="p">}]);</span>
+</pre></div>
+
+<h3>Move</h3>
+
+<p>Patch syntax: <code>{move: &lt;path&gt;, to: &lt;path&gt;}</code></p>
+
+<div class="highlight"><pre><span class="c1">// Move property, result {bar: [1, 2, 3]}</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">move</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">to</span><span class="o">:</span> <span class="s1">'/bar'</span><span class="p">}]);</span>
+</pre></div>
+
+<h3>Test</h3>
+
+<p>Patch syntax: <code>{test: &lt;path&gt;, value: &lt;value&gt;}</code></p>
+
+<div class="highlight"><pre><span class="c1">// Test property, result: true</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">test</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">}]</span>
+</pre></div>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/bruth/jsonpatch-js/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/bruth/jsonpatch-js/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/bruth/jsonpatch-js"></a> is maintained by <a href="https://github.com/bruth">bruth</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
 </html>
