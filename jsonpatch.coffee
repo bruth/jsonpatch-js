@@ -9,7 +9,7 @@
     else if typeof define is 'function' and define.amd
         # AMD
         define ['exports'], (exports) ->
-            root.jsonatpch = factory(root, exports)
+            root.jsonpatch = factory(root, exports)
     else
         # Browser globals
         root.jsonpatch = factory(root, {})
