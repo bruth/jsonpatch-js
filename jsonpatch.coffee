@@ -1,20 +1,19 @@
-# jsonpatch.js 0.2.1
+# jsonpatch.js 0.2.2
 # (c) 2011 Byron Ruth
-# jsonpatch may be freely distributed under the MIT license
+# jsonpatch may be freely distributed under the BSD license
 
-# Run-anywhere Javascript Boilerplate Code
-# http://www.sitepen.com/blog/2010/09/30/run-anywhere-javascript-modules-boilerplate-code/
-((name, factory) ->
-    if typeof required is 'undefined'
-        # direct script
-        factory(this[name] = {})
-    else if typeof exports is 'undefined'
-        # browser transport/C loader or RequireJS
-        define(name, ['exports'], factory)
+((root, factory) ->
+    if typeof exports isnt 'undefined'
+        # Node/CommonJS
+        factory(root, exports)
+    else if typeof define is 'function' and define.amd
+        # AMD
+        define ['exports'], (exports) ->
+            root.jsonatpch = factory(root, exports)
     else
-        # CommonJS environment
-        factory(exports)
-) 'jsonpatch', (exports) ->
+        # Browser globals
+        root.jsonpatch = factory(root, {})
+) @, (root) ->
 
     # Utilities
     toString = Object.prototype.toString
@@ -295,8 +294,10 @@
                 result = op.apply(root)
             return result
 
-    exports.apply = apply
-    exports.compile = compile
-    exports.JSONPatchError = JSONPatchError
-    exports.InvalidPatchError = InvalidPatchError
-    exports.PatchConflictError = PatchConflictError
+    # Export to root
+    root.apply = apply
+    root.compile = compile
+    root.JSONPatchError = JSONPatchError
+    root.InvalidPatchError = InvalidPatchError
+    root.PatchConflictError = PatchConflictError
+    return root
