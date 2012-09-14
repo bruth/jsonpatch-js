@@ -9,7 +9,7 @@
       return factory(root, exports);
     } else if (typeof define === 'function' && define.amd) {
       return define(['exports'], function(exports) {
-        return root.jsonatpch = factory(root, exports);
+        return root.jsonpatch = factory(root, exports);
       });
     } else {
       return root.jsonpatch = factory(root, {});
