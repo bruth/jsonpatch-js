@@ -210,7 +210,7 @@
 
         if isArray(obj)
             acc = parseInt(acc, 10)
-            if not (acc in obj)
+            if not (acc of obj)
                 throw new PatchConflictError("Value at #{acc} does not exist")
             obj.splice(acc, 1, value)
         else

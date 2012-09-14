@@ -255,7 +255,7 @@
       acc = pointer.accessor;
       if (isArray(obj)) {
         acc = parseInt(acc, 10);
-        if (!(__indexOf.call(obj, acc) >= 0)) {
+        if (!(acc in obj)) {
           throw new PatchConflictError("Value at " + acc + " does not exist");
         }
         obj.splice(acc, 1, value);
