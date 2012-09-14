@@ -142,7 +142,7 @@
         getObject: (obj) ->
             for loc in @path
                 if isArray obj then loc = parseInt(loc, 10)
-                if not hasOwnProperty.call(obj, loc)
+                if loc not of obj
                     throw new PatchConflictError('Array location out of bounds or not an instance property')
                 obj = obj[loc]
             return obj
@@ -184,7 +184,7 @@
                 throw new PatchConflictError("Index #{acc} out of bounds")
             obj.splice(acc, 0, value)
         else
-            if hasOwnProperty.call(obj, acc)
+            if acc of obj
                 throw new PatchConflictError("Value at #{acc} exists")
             obj[acc] = value
         return
@@ -195,11 +195,11 @@
 
         if isArray(obj)
             acc = parseInt(acc, 10)
-            if not hasOwnProperty.call(obj, acc)
+            if acc not of obj
                 throw new PatchConflictError("Value at #{acc} does not exist")
             obj.splice(acc, 1)
         else
-            if not hasOwnProperty.call(obj, acc)
+            if acc not of obj
                 throw new PatchConflictError("Value at #{acc} does not exist")
             delete obj[acc]
         return
@@ -210,11 +210,11 @@
 
         if isArray(obj)
             acc = parseInt(acc, 10)
-            if not hasOwnProperty.call(obj, acc)
+            if acc not of obj
                 throw new PatchConflictError("Value at #{acc} does not exist")
             obj.splice(acc, 1, value)
         else
-            if not hasOwnProperty.call(obj, acc)
+            if acc not of obj
                 throw new PatchConflictError("Value at #{acc} does not exist")
             obj[acc] = value
         return
@@ -236,11 +236,11 @@
 
         if isArray(obj)
             acc = parseInt(acc, 10)
-            if not hasOwnProperty.call(obj, acc)
+            if acc not of obj
                 throw new PatchConflictError("Value at #{acc} does not exist")
             value = obj.splice(acc, 1)[0]
         else
-            if not hasOwnProperty.call(obj, acc)
+            if acc not of obj
                 throw new PatchConflictError("Value at #{acc} does not exist")
             value = obj[acc]
             delete obj[acc]
@@ -255,7 +255,7 @@
                 throw new PatchConflictError("Index #{acc} out of bounds")
             obj.splice(acc, 0, value)
         else
-            if hasOwnProperty.call(obj, acc)
+            if acc of obj
                 throw new PatchConflictError("Value at #{acc} exists")
             obj[acc] = value
         return
