@@ -140,37 +140,3 @@ JSLitmus.test('Compiled Test Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
     testCompiled(obj);
 });
-
-JSLitmus.test('@dharmafly - Add Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}]};
-    djsonpatch.apply_patch(obj, [{add: '/bar', value: [1, 2, 3, 4]}]);
-});
-
-JSLitmus.test('@dharmafly - Remove Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    djsonpatch.apply_patch(obj, [{remove: '/bar'}]);
-});
-
-JSLitmus.test('@dharmafly - Replace Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}]};
-    djsonpatch.apply_patch(obj, [{replace: '/foo', value: [1, 2, 3, 4]}]);
-});
-
-
-var addPatch = new djsonpatch.JSONPatch([{add: '/bar', value: [1, 2, 3, 4]}]);
-JSLitmus.test('@dharmafly - Compiled Add Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}]};
-    addPatch.apply(obj);
-});
-
-var removePatch = new djsonpatch.JSONPatch([{remove: '/bar'}]);
-JSLitmus.test('@dharmafly - Compiled Remove Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    removePatch.apply(obj);
-});
-
-var replacePatch = new djsonpatch.JSONPatch([{replace: '/foo', value: [1, 2, 3, 4]}]);
-JSLitmus.test('@dharmafly - Compiled Replace Operation', function() {
-    obj = {foo: 1, baz: [{qux: 'hello'}]};
-    replacePatch.apply(obj);
-});
