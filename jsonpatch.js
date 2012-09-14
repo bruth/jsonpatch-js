@@ -163,14 +163,14 @@
       }
 
       JSONPointer.prototype.getObject = function(obj) {
-        var loc, _i, _len, _ref, _ref1;
+        var loc, _i, _len, _ref;
         _ref = this.path;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           loc = _ref[_i];
           if (isArray(obj)) {
             loc = parseInt(loc, 10);
           }
-          if (_ref1 = !loc, __indexOf.call(obj, _ref1) >= 0) {
+          if (!(loc in obj)) {
             throw new PatchConflictError('Array location out of bounds or not an instance property');
           }
           obj = obj[loc];
@@ -226,41 +226,41 @@
         }
         obj.splice(acc, 0, value);
       } else {
-        if (__indexOf.call(obj, acc) >= 0) {
+        if (acc in obj) {
           throw new PatchConflictError("Value at " + acc + " exists");
         }
         obj[acc] = value;
       }
     };
     remove = function(root, pointer) {
-      var acc, obj, _ref, _ref1;
+      var acc, obj;
       obj = pointer.getObject(root);
       acc = pointer.accessor;
       if (isArray(obj)) {
         acc = parseInt(acc, 10);
-        if (_ref = !acc, __indexOf.call(obj, _ref) >= 0) {
+        if (!(acc in obj)) {
           throw new PatchConflictError("Value at " + acc + " does not exist");
         }
         obj.splice(acc, 1);
       } else {
-        if (_ref1 = !acc, __indexOf.call(obj, _ref1) >= 0) {
+        if (!(acc in obj)) {
           throw new PatchConflictError("Value at " + acc + " does not exist");
         }
         delete obj[acc];
       }
     };
     replace = function(root, pointer, value) {
-      var acc, obj, _ref, _ref1;
+      var acc, obj;
       obj = pointer.getObject(root);
       acc = pointer.accessor;
       if (isArray(obj)) {
         acc = parseInt(acc, 10);
-        if (_ref = !acc, __indexOf.call(obj, _ref) >= 0) {
+        if (!(__indexOf.call(obj, acc) >= 0)) {
           throw new PatchConflictError("Value at " + acc + " does not exist");
         }
         obj.splice(acc, 1, value);
       } else {
-        if (_ref1 = !acc, __indexOf.call(obj, _ref1) >= 0) {
+        if (!(acc in obj)) {
           throw new PatchConflictError("Value at " + acc + " does not exist");
         }
         obj[acc] = value;
@@ -276,17 +276,17 @@
       return isEqual(obj[acc], value);
     };
     move = function(root, from, to) {
-      var acc, obj, value, _ref, _ref1;
+      var acc, obj, value;
       obj = from.getObject(root);
       acc = from.accessor;
       if (isArray(obj)) {
         acc = parseInt(acc, 10);
-        if (_ref = !acc, __indexOf.call(obj, _ref) >= 0) {
+        if (!(acc in obj)) {
           throw new PatchConflictError("Value at " + acc + " does not exist");
         }
         value = obj.splice(acc, 1)[0];
       } else {
-        if (_ref1 = !acc, __indexOf.call(obj, _ref1) >= 0) {
+        if (!(acc in obj)) {
           throw new PatchConflictError("Value at " + acc + " does not exist");
         }
         value = obj[acc];
@@ -301,7 +301,7 @@
         }
         obj.splice(acc, 0, value);
       } else {
-        if (__indexOf.call(obj, acc) >= 0) {
+        if (acc in obj) {
           throw new PatchConflictError("Value at " + acc + " exists");
         }
         obj[acc] = value;
