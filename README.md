@@ -68,7 +68,7 @@ Copy
 Patch syntax: ``{copy: <path>, to: <path>}``
 
 ```javascript
-// Move property, result {foo: [1, 2, 3], bar: 2}
+// Copy property, result {foo: [1, 2, 3], bar: 2}
 jsonpatch.apply({foo: [1, 2, 3]}, [{copy: '/foo/1', to: '/bar'}]);
 ```
 
