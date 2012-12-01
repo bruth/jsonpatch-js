@@ -1,4 +1,4 @@
-# jsonpatch.js 0.2.2
+# jsonpatch.js 0.2.3
 # (c) 2011 Byron Ruth
 # jsonpatch may be freely distributed under the BSD license
 
@@ -261,12 +261,46 @@
         return
 
     
+    copy = (root, from, to) ->
+        if to is undefined
+            throw new InvalidPatchError("Patch member 'to' not defined")
+
+        # Get value
+        obj = from.getObject(root)
+        acc = from.accessor
+
+        if isArray(obj)
+            acc = parseInt(acc, 10)
+            if acc not of obj
+                throw new PatchConflictError("Value at #{acc} does not exist")
+            value = obj.slice(acc, acc + 1)[0]
+        else
+            if acc not of obj
+                throw new PatchConflictError("Value at #{acc} does not exist")
+            value = obj[acc]
+
+        obj = to.getObject(root)
+        acc = to.accessor
+
+        # Add to object
+        if isArray(obj)
+            acc = parseInt(acc, 10)
+            if acc < 0 or acc > obj.length
+                throw new PatchConflictError("Index #{acc} out of bounds")
+            obj.splice(acc, 0, value)
+        else
+            if acc of obj
+                throw new PatchConflictError("Value at #{acc} exists")
+            obj[acc] = value
+        return
+
     # Map of API functions
     methodMap =
         add: add
         remove: remove
         replace: replace
         move: move
+        copy: copy
         test: test
 
     # Map of operations and their supplemtary member
@@ -275,11 +309,13 @@
         remove: null
         replace: 'value'
         test: 'value'
+        copy: 'to'
         move: 'to'
 
     # Map of operation member pre-processors
     memberProcessors =
         move: (to) -> new JSONPointer(to)
+        copy: (to) -> new JSONPointer(to)
 
     apply = (root, patchDocument) ->
         compile(patchDocument)(root)

@@ -83,6 +83,18 @@ test('move', function() {
     jsonpatch.apply(obj, [{move: '/baz/0/qux', to: '/baz/1'}]);
     deepEqual(obj, {baz: [{}, 'hello'], bar: 1});
 });
+
+
+test('copy', function() {
+    obj = {foo: 1, baz: [{qux: 'hello'}]};
+
+    jsonpatch.apply(obj, [{copy: '/foo', to: '/bar'}]);
+    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: 1});
+
+    jsonpatch.apply(obj, [{copy: '/baz/0/qux', to: '/baz/1'}]);
+    deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}, 'hello'], bar: 1});
+});
+
    
 
 // JSLitmus
@@ -105,6 +117,12 @@ JSLitmus.test('Move Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
     jsonpatch.apply(obj, [{move: '/baz/0', to: '/bar/0'}]);
 });
+
+JSLitmus.test('Copy Operation', function() {
+    obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
+    jsonpatch.apply(obj, [{copy: '/baz/0', to: '/bar/0'}]);
+});
+
 
 JSLitmus.test('Test Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
@@ -134,6 +152,13 @@ JSLitmus.test('Compiled Move Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
     moveCompiled(obj);
 });
+
+var copyCompiled = jsonpatch.compile([{copy: '/baz/0', to: '/bar/0'}]);
+JSLitmus.test('Compiled Copy Operation', function() {
+    obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
+    copyCompiled(obj);
+});
+
 
 var testCompiled = jsonpatch.compile([{test: '/baz', value: [{qux: 'hello'}]}]);
 JSLitmus.test('Compiled Test Operation', function() {
