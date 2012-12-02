@@ -1,0 +1,5 @@
+{
+  "name": "json-patch",
+  "version": "0.2.3",
+  "main": "./jsonpatch.js"
+}
