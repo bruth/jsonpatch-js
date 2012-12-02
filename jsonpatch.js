@@ -15,7 +15,7 @@
       return root.jsonpatch = factory(root, {});
     }
   })(this, function(root) {
-    var InvalidPatchError, JSONPatch, JSONPatchError, JSONPointer, PatchConflictError, add, apply, compile, copy, hasOwnProperty, isArray, isEqual, isObject, isString, memberProcessors, methodMap, move, operationMembers, remove, replace, test, toString, _isEqual;
+    var AddPatch, CopyPatch, InvalidPatchError, InvalidPointerError, JSONPatch, JSONPatchError, JSONPointer, MovePatch, PatchConflictError, RemovePatch, ReplacePatch, TestPatch, apply, compile, hasOwnProperty, isArray, isEqual, isObject, isString, operationMap, toString, _isEqual;
     toString = Object.prototype.toString;
     hasOwnProperty = Object.prototype.hasOwnProperty;
     isArray = function(obj) {
@@ -113,11 +113,23 @@
       __extends(JSONPatchError, _super);
 
       function JSONPatchError(message) {
+        this.message = message != null ? message : 'JSON patch error';
         this.name = 'JSONPatchError';
-        this.message = message || 'JSON patch error';
       }
 
       return JSONPatchError;
+
+    })(Error);
+    InvalidPointerError = (function(_super) {
+
+      __extends(InvalidPointerError, _super);
+
+      function InvalidPointerError(message) {
+        this.message = message != null ? message : 'Invalid pointer';
+        this.name = 'InvalidPointer';
+      }
+
+      return InvalidPointerError;
 
     })(Error);
     InvalidPatchError = (function(_super) {
@@ -125,8 +137,8 @@
       __extends(InvalidPatchError, _super);
 
       function InvalidPatchError(message) {
+        this.message = message != null ? message : 'Invalid patch';
         this.name = 'InvalidPatch';
-        this.message = message || 'Invalid patch';
       }
 
       return InvalidPatchError;
@@ -137,8 +149,8 @@
       __extends(PatchConflictError, _super);
 
       function PatchConflictError(message) {
+        this.message = message != null ? message : 'Patch conflict';
         this.name = 'PatchConflictError';
-        this.message = message || 'Patch conflict';
       }
 
       return PatchConflictError;
@@ -146,36 +158,35 @@
     })(JSONPatchError);
     JSONPointer = (function() {
 
-      function JSONPointer(path, shouldExist) {
-        var i, loc, steps, _i, _len;
-        if (shouldExist == null) {
-          shouldExist = true;
-        }
+      function JSONPointer(path) {
+        var i, step, steps, _i, _len;
+        steps = [];
         if (path && (steps = path.split('/')).shift() !== '') {
-          throw new InvalidPatchError();
+          throw new InvalidPointerError();
         }
         for (i = _i = 0, _len = steps.length; _i < _len; i = ++_i) {
-          loc = steps[i];
-          steps[i] = decodeURIComponent(loc);
+          step = steps[i];
+          steps[i] = decodeURIComponent(step).replace('~0', '~').replace('~1', '/');
         }
         this.accessor = steps.pop();
-        this.path = steps;
+        this.steps = steps;
+        this.path = path;
       }
 
-      JSONPointer.prototype.getObject = function(obj) {
-        var loc, _i, _len, _ref;
-        _ref = this.path;
+      JSONPointer.prototype.getReference = function(parent) {
+        var step, _i, _len, _ref;
+        _ref = this.steps;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          loc = _ref[_i];
-          if (isArray(obj)) {
-            loc = parseInt(loc, 10);
+          step = _ref[_i];
+          if (isArray(parent)) {
+            step = parseInt(step, 10);
           }
-          if (!(loc in obj)) {
-            throw new PatchConflictError('Array location out of bounds or not an instance property');
+          if (!(step in parent)) {
+            throw new PatchConflictError('Array location out of ', 'bounds or not an instance property');
           }
-          obj = obj[loc];
+          parent = parent[step];
         }
-        return obj;
+        return parent;
       };
 
       return JSONPointer;
@@ -184,206 +195,307 @@
     JSONPatch = (function() {
 
       function JSONPatch(patch) {
-        var key, member, method, preproc, supp;
-        for (key in patch) {
-          if (!(method = methodMap[key])) {
-            continue;
-          }
-          if (this.operation) {
-            throw new InvalidPatchError();
-          }
-          if ((member = operationMembers[key]) && patch[member] === void 0) {
-            throw new InvalidPatchError("Patch member " + member + " not defined");
-          }
-          this.operation = methodMap[key];
-          this.pointer = new JSONPointer(patch[key]);
-          supp = patch[member];
-          if ((preproc = memberProcessors[key])) {
-            supp = preproc(supp);
-          }
-          this.supplement = supp;
-        }
-        if (!this.operation) {
+        if (!('path' in patch)) {
           throw new InvalidPatchError();
         }
+        this.validate(patch);
+        this.patch = patch;
+        this.path = new JSONPointer(patch.path);
+        this.initialize(patch);
       }
 
-      JSONPatch.prototype.apply = function(obj) {
-        return this.operation(obj, this.pointer, this.supplement);
+      JSONPatch.prototype.initialize = function() {};
+
+      JSONPatch.prototype.validate = function(patch) {};
+
+      JSONPatch.prototype.apply = function(document) {
+        throw new Error('Method not implemented');
       };
 
       return JSONPatch;
 
     })();
-    add = function(root, pointer, value) {
-      var acc, obj;
-      obj = pointer.getObject(root);
-      acc = pointer.accessor;
-      if (isArray(obj)) {
-        acc = parseInt(acc, 10);
-        if (acc < 0 || acc > obj.length) {
-          throw new PatchConflictError("Index " + acc + " out of bounds");
-        }
-        obj.splice(acc, 0, value);
-      } else {
-        if (acc in obj) {
-          throw new PatchConflictError("Value at " + acc + " exists");
-        }
-        obj[acc] = value;
+    AddPatch = (function(_super) {
+
+      __extends(AddPatch, _super);
+
+      function AddPatch() {
+        return AddPatch.__super__.constructor.apply(this, arguments);
       }
-    };
-    remove = function(root, pointer) {
-      var acc, obj;
-      obj = pointer.getObject(root);
-      acc = pointer.accessor;
-      if (isArray(obj)) {
-        acc = parseInt(acc, 10);
-        if (!(acc in obj)) {
-          throw new PatchConflictError("Value at " + acc + " does not exist");
+
+      AddPatch.prototype.validate = function(patch) {
+        if (!('value' in patch)) {
+          throw new InvalidPatchError();
         }
-        obj.splice(acc, 1);
-      } else {
-        if (!(acc in obj)) {
-          throw new PatchConflictError("Value at " + acc + " does not exist");
+      };
+
+      AddPatch.prototype.apply = function(document) {
+        var accessor, reference, value;
+        reference = this.path.getReference(document);
+        accessor = this.path.accessor;
+        value = this.patch.value;
+        if (isArray(reference)) {
+          if (accessor === '-') {
+            reference.push(value);
+          } else {
+            accessor = parseInt(accessor, 10);
+            if (accessor < 0 || accessor > reference.length) {
+              throw new PatchConflictError("Index " + accessor + " out of bounds");
+            }
+            reference.splice(accessor, 0, value);
+          }
+        } else {
+          if (accessor in reference) {
+            throw new PatchConflictError("Value at " + accessor + " exists");
+          }
+          reference[accessor] = value;
         }
-        delete obj[acc];
+      };
+
+      return AddPatch;
+
+    })(JSONPatch);
+    RemovePatch = (function(_super) {
+
+      __extends(RemovePatch, _super);
+
+      function RemovePatch() {
+        return RemovePatch.__super__.constructor.apply(this, arguments);
       }
-    };
-    replace = function(root, pointer, value) {
-      var acc, obj;
-      obj = pointer.getObject(root);
-      acc = pointer.accessor;
-      if (isArray(obj)) {
-        acc = parseInt(acc, 10);
-        if (!(acc in obj)) {
-          throw new PatchConflictError("Value at " + acc + " does not exist");
+
+      RemovePatch.prototype.apply = function(document) {
+        var accessor, reference;
+        reference = this.path.getReference(document);
+        accessor = this.path.accessor;
+        if (isArray(reference)) {
+          accessor = parseInt(accessor, 10);
+          if (!(accessor in reference)) {
+            throw new PatchConflictError("Value at " + accessor + " does not exist");
+          }
+          reference.splice(accessor, 1);
+        } else {
+          if (!(accessor in reference)) {
+            throw new PatchConflictError("Value at " + accessor + " does not exist");
+          }
+          delete reference[accessor];
         }
-        obj.splice(acc, 1, value);
-      } else {
-        if (!(acc in obj)) {
-          throw new PatchConflictError("Value at " + acc + " does not exist");
-        }
-        obj[acc] = value;
+      };
+
+      return RemovePatch;
+
+    })(JSONPatch);
+    ReplacePatch = (function(_super) {
+
+      __extends(ReplacePatch, _super);
+
+      function ReplacePatch() {
+        return ReplacePatch.__super__.constructor.apply(this, arguments);
       }
-    };
-    test = function(root, pointer, value) {
-      var acc, obj;
-      obj = pointer.getObject(root);
-      acc = pointer.accessor;
-      if (isArray(obj)) {
-        acc = parseInt(acc, 10);
+
+      ReplacePatch.prototype.validate = function(patch) {
+        if (!('value' in patch)) {
+          throw new InvalidPatchError();
+        }
+      };
+
+      ReplacePatch.prototype.apply = function(document) {
+        var accessor, reference, value;
+        reference = this.path.getReference(document);
+        accessor = this.path.accessor;
+        value = this.patch.value;
+        if (isArray(reference)) {
+          accessor = parseInt(accessor, 10);
+          if (!(accessor in reference)) {
+            throw new PatchConflictError("Value at " + accessor + " does not exist");
+          }
+          reference.splice(accessor, 1, value);
+        } else {
+          if (!(accessor in reference)) {
+            throw new PatchConflictError("Value at " + accessor + " does not exist");
+          }
+          reference[accessor] = value;
+        }
+      };
+
+      return ReplacePatch;
+
+    })(JSONPatch);
+    TestPatch = (function(_super) {
+
+      __extends(TestPatch, _super);
+
+      function TestPatch() {
+        return TestPatch.__super__.constructor.apply(this, arguments);
       }
-      return isEqual(obj[acc], value);
-    };
-    move = function(root, from, to) {
-      var acc, obj, value;
-      obj = from.getObject(root);
-      acc = from.accessor;
-      if (isArray(obj)) {
-        acc = parseInt(acc, 10);
-        if (!(acc in obj)) {
-          throw new PatchConflictError("Value at " + acc + " does not exist");
+
+      TestPatch.prototype.validate = function(patch) {
+        if (!('value' in patch)) {
+          throw new InvalidPatchError();
         }
-        value = obj.splice(acc, 1)[0];
-      } else {
-        if (!(acc in obj)) {
-          throw new PatchConflictError("Value at " + acc + " does not exist");
+      };
+
+      TestPatch.prototype.apply = function(document) {
+        var accessor, reference, value;
+        reference = this.path.getReference(document);
+        accessor = this.path.accessor;
+        value = this.patch.value;
+        if (isArray(reference)) {
+          accessor = parseInt(accessor, 10);
         }
-        value = obj[acc];
-        delete obj[acc];
+        return isEqual(reference[accessor], value);
+      };
+
+      return TestPatch;
+
+    })(JSONPatch);
+    MovePatch = (function(_super) {
+
+      __extends(MovePatch, _super);
+
+      function MovePatch() {
+        return MovePatch.__super__.constructor.apply(this, arguments);
       }
-      obj = to.getObject(root);
-      acc = to.accessor;
-      if (isArray(obj)) {
-        acc = parseInt(acc, 10);
-        if (acc < 0 || acc > obj.length) {
-          throw new PatchConflictError("Index " + acc + " out of bounds");
+
+      MovePatch.prototype.initialize = function(patch) {
+        var i, len, within, _i;
+        this.to = new JSONPointer(patch.to);
+        len = this.path.steps.length;
+        within = true;
+        for (i = _i = 0; 0 <= len ? _i <= len : _i >= len; i = 0 <= len ? ++_i : --_i) {
+          if (this.path.steps[i] !== this.to.steps[i]) {
+            within = false;
+            break;
+          }
         }
-        obj.splice(acc, 0, value);
-      } else {
-        if (acc in obj) {
-          throw new PatchConflictError("Value at " + acc + " exists");
+        if (within) {
+          if (this.to.steps.length !== len) {
+            throw new InvalidPatchError("'to' member cannot be a descendent of 'path'");
+          }
+          if (this.path.accessor === this.to.accessor) {
+            return this.apply = function() {};
+          }
         }
-        obj[acc] = value;
+      };
+
+      MovePatch.prototype.validate = function(patch) {
+        if (!('to' in patch)) {
+          throw new InvalidPatchError();
+        }
+      };
+
+      MovePatch.prototype.apply = function(document) {
+        var accessor, reference, value;
+        reference = this.path.getReference(document);
+        accessor = this.path.accessor;
+        if (isArray(reference)) {
+          accessor = parseInt(accessor, 10);
+          if (!(accessor in reference)) {
+            throw new PatchConflictError("Value at " + accessor + " does not exist");
+          }
+          value = reference.splice(accessor, 1)[0];
+        } else {
+          if (!(accessor in reference)) {
+            throw new PatchConflictError("Value at " + accessor + " does not exist");
+          }
+          value = reference[accessor];
+          delete reference[accessor];
+        }
+        reference = this.to.getReference(document);
+        accessor = this.to.accessor;
+        if (isArray(reference)) {
+          accessor = parseInt(accessor, 10);
+          if (accessor < 0 || accessor > reference.length) {
+            throw new PatchConflictError("Index " + accessor + " out of bounds");
+          }
+          reference.splice(accessor, 0, value);
+        } else {
+          if (accessor in reference) {
+            throw new PatchConflictError("Value at " + accessor + " exists");
+          }
+          reference[accessor] = value;
+        }
+      };
+
+      return MovePatch;
+
+    })(JSONPatch);
+    CopyPatch = (function(_super) {
+
+      __extends(CopyPatch, _super);
+
+      function CopyPatch() {
+        return CopyPatch.__super__.constructor.apply(this, arguments);
       }
-    };
-    copy = function(root, from, to) {
-      var acc, obj, value;
-      obj = from.getObject(root);
-      acc = from.accessor;
-      if (isArray(obj)) {
-        acc = parseInt(acc, 10);
-        if (!(acc in obj)) {
-          throw new PatchConflictError("Value at " + acc + " does not exist");
+
+      CopyPatch.prototype.apply = function(document) {
+        var accessor, reference, value;
+        reference = this.path.getReference(document);
+        accessor = this.path.accessor;
+        if (isArray(reference)) {
+          accessor = parseInt(accessor, 10);
+          if (!(accessor in reference)) {
+            throw new PatchConflictError("Value at " + accessor + " does not exist");
+          }
+          value = reference.slice(accessor, accessor + 1)[0];
+        } else {
+          if (!(accessor in reference)) {
+            throw new PatchConflictError("Value at " + accessor + " does not exist");
+          }
+          value = reference[accessor];
         }
-        value = obj.slice(acc, acc + 1)[0];
-      } else {
-        if (!(acc in obj)) {
-          throw new PatchConflictError("Value at " + acc + " does not exist");
+        reference = this.to.getReference(document);
+        accessor = this.to.accessor;
+        if (isArray(reference)) {
+          accessor = parseInt(accessor, 10);
+          if (accessor < 0 || accessor > reference.length) {
+            throw new PatchConflictError("Index " + accessor + " out of bounds");
+          }
+          reference.splice(accessor, 0, value);
+        } else {
+          if (accessor in reference) {
+            throw new PatchConflictError("Value at " + accessor + " exists");
+          }
+          reference[accessor] = value;
         }
-        value = obj[acc];
-      }
-      obj = to.getObject(root);
-      acc = to.accessor;
-      if (isArray(obj)) {
-        acc = parseInt(acc, 10);
-        if (acc < 0 || acc > obj.length) {
-          throw new PatchConflictError("Index " + acc + " out of bounds");
+      };
+
+      return CopyPatch;
+
+    })(MovePatch);
+    operationMap = {
+      add: AddPatch,
+      remove: RemovePatch,
+      replace: ReplacePatch,
+      move: MovePatch,
+      copy: CopyPatch,
+      test: TestPatch
+    };
+    compile = function(patch) {
+      var klass, ops, p, _i, _len;
+      ops = [];
+      for (_i = 0, _len = patch.length; _i < _len; _i++) {
+        p = patch[_i];
+        if (!(klass = operationMap[p.op])) {
+          throw new InvalidPatchError();
         }
-        obj.splice(acc, 0, value);
-      } else {
-        if (acc in obj) {
-          throw new PatchConflictError("Value at " + acc + " exists");
-        }
-        obj[acc] = value;
+        ops.push(new klass(p));
       }
-    };
-    methodMap = {
-      add: add,
-      remove: remove,
-      replace: replace,
-      move: move,
-      copy: copy,
-      test: test
-    };
-    operationMembers = {
-      add: 'value',
-      remove: null,
-      replace: 'value',
-      test: 'value',
-      copy: 'to',
-      move: 'to'
-    };
-    memberProcessors = {
-      move: function(to) {
-        return new JSONPointer(to);
-      },
-      copy: function(to) {
-        return new JSONPointer(to);
-      }
-    };
-    apply = function(root, patchDocument) {
-      return compile(patchDocument)(root);
-    };
-    compile = function(patchDocument) {
-      var operations, patch, _i, _len;
-      operations = [];
-      for (_i = 0, _len = patchDocument.length; _i < _len; _i++) {
-        patch = patchDocument[_i];
-        operations.push(new JSONPatch(patch));
-      }
-      return function(root) {
+      return function(document) {
         var op, result, _j, _len1;
-        for (_j = 0, _len1 = operations.length; _j < _len1; _j++) {
-          op = operations[_j];
-          result = op.apply(root);
+        for (_j = 0, _len1 = ops.length; _j < _len1; _j++) {
+          op = ops[_j];
+          result = op.apply(document);
         }
         return result;
       };
     };
+    apply = function(document, patch) {
+      return compile(patch)(document);
+    };
     root.apply = apply;
     root.compile = compile;
     root.JSONPatchError = JSONPatchError;
+    root.InvalidPointerError = InvalidPointerError;
     root.InvalidPatchError = InvalidPatchError;
     root.PatchConflictError = PatchConflictError;
     return root;

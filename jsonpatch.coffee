@@ -1,4 +1,4 @@
-# jsonpatch.js 0.2.3
+# jsonpatch.js 0.3.0
 # (c) 2011 Byron Ruth
 # jsonpatch may be freely distributed under the BSD license
 
@@ -107,230 +107,270 @@
 
     # Various error constructors
     class JSONPatchError extends Error
-        constructor: (message) ->
+        constructor: (@message='JSON patch error') ->
             @name = 'JSONPatchError'
-            @message = message or 'JSON patch error'
+
+    class InvalidPointerError extends Error
+        constructor: (@message='Invalid pointer') ->
+            @name = 'InvalidPointer'
 
     class InvalidPatchError extends JSONPatchError
-        constructor: (message) ->
+        constructor: (@message='Invalid patch') ->
             @name = 'InvalidPatch'
-            @message = message or 'Invalid patch'
 
     class PatchConflictError extends JSONPatchError
-        constructor: (message) ->
+        constructor: (@message='Patch conflict') ->
             @name = 'PatchConflictError'
-            @message = message or 'Patch conflict'
 
 
-    # Spec: http://tools.ietf.org/html/draft-pbryan-zyp-json-pointer-02
+    # Spec: http://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-05
     class JSONPointer
-        constructor: (path, shouldExist=true) ->
+        constructor: (path) ->
+            steps = []
             # If a path is specified, it must start with a /
             if path and (steps = path.split '/').shift() isnt ''
-                throw new InvalidPatchError()
+                throw new InvalidPointerError()
 
-            # Decode each component
-            for loc, i in steps
-                steps[i] = decodeURIComponent(loc)
+            # Decode each component, decode JSON Pointer specific syntax ~0 and ~1
+            for step, i in steps
+                steps[i] = decodeURIComponent(step).replace('~0', '~').replace('~1', '/')
 
             # The final segment is the accessor (property/index) of the object
             # the pointer ultimately references
             @accessor = steps.pop()
-            @path = steps
+            @steps = steps
+            @path = path
 
-        # Returns a reference of the object that the pointer represents
-        getObject: (obj) ->
-            for loc in @path
-                if isArray obj then loc = parseInt(loc, 10)
-                if loc not of obj
-                    throw new PatchConflictError('Array location out of bounds or not an instance property')
-                obj = obj[loc]
-            return obj
+            # Returns an object with the object reference and the accessor
+        getReference: (parent) ->
+            for step in @steps
+                if isArray parent then step = parseInt(step, 10)
+                if step not of parent
+                    throw new PatchConflictError('Array location out of '
+                        'bounds or not an instance property')
+                parent = parent[step]
+            return parent
 
 
+    # Interface for patch operation classes
     class JSONPatch
         constructor: (patch) ->
-            for key of patch
-                # Ensure this is a valid operation
-                if not (method = methodMap[key]) then continue
-                # A patch operation has already been defined
-                if @operation then throw new InvalidPatchError()
-                # If a supplementary member is required (not null), ensure it exists
-                if (member = operationMembers[key]) and patch[member] is undefined
-                    throw new InvalidPatchError("Patch member #{member} not defined")
+            # All patches required a 'path' member
+            if 'path' not of patch
+                throw new InvalidPatchError()
 
-                # Store reference to operation function
-                @operation = methodMap[key]
-                # This will always be a pointer
-                @pointer = new JSONPointer(patch[key])
+            # Validates the patch based on the requirements of this operation
+            @validate(patch)
+            @patch = patch
+            # Create the primary pointer for this operation
+            @path = new JSONPointer(patch.path)
+            # Call for operation-specific setup
+            @initialize(patch)
 
-                supp = patch[member]
-                if (preproc = memberProcessors[key])
-                    supp = preproc(supp)
-                @supplement = supp
+        initialize: ->
 
-            if not @operation then throw new InvalidPatchError()
+        validate: (patch) ->
 
-        apply: (obj) -> @operation(obj, @pointer, @supplement)
-
-    # Patch functions
-    add = (root, pointer, value) ->
-        obj = pointer.getObject(root)
-        acc = pointer.accessor
-
-        if isArray(obj)
-            acc = parseInt(acc, 10)
-            if acc < 0 or acc > obj.length
-                throw new PatchConflictError("Index #{acc} out of bounds")
-            obj.splice(acc, 0, value)
-        else
-            if acc of obj
-                throw new PatchConflictError("Value at #{acc} exists")
-            obj[acc] = value
-        return
-
-    remove = (root, pointer) ->
-        obj = pointer.getObject(root)
-        acc = pointer.accessor
-
-        if isArray(obj)
-            acc = parseInt(acc, 10)
-            if acc not of obj
-                throw new PatchConflictError("Value at #{acc} does not exist")
-            obj.splice(acc, 1)
-        else
-            if acc not of obj
-                throw new PatchConflictError("Value at #{acc} does not exist")
-            delete obj[acc]
-        return
-
-    replace = (root, pointer, value) ->
-        obj = pointer.getObject(root)
-        acc = pointer.accessor
-
-        if isArray(obj)
-            acc = parseInt(acc, 10)
-            if acc not of obj
-                throw new PatchConflictError("Value at #{acc} does not exist")
-            obj.splice(acc, 1, value)
-        else
-            if acc not of obj
-                throw new PatchConflictError("Value at #{acc} does not exist")
-            obj[acc] = value
-        return
+        apply: (document) -> throw new Error('Method not implemented')
 
 
-    test = (root, pointer, value) ->
-        obj = pointer.getObject(root)
-        acc = pointer.accessor
+    class AddPatch extends JSONPatch
+        validate: (patch) ->
+            if 'value' not of patch then throw new InvalidPatchError()
 
-        if isArray(obj)
-            acc = parseInt(acc, 10)
-        return isEqual(obj[acc], value)
+        apply: (document) ->
+            reference = @path.getReference(document)
+            accessor = @path.accessor
+            value = @patch.value
+
+            if isArray(reference)
+                if accessor is '-'
+                    reference.push(value)
+                else
+                    accessor = parseInt(accessor, 10)
+                    if accessor < 0 or accessor > reference.length
+                        throw new PatchConflictError("Index #{accessor} out of bounds")
+                    reference.splice(accessor, 0, value)
+            else
+                if accessor of reference
+                    throw new PatchConflictError("Value at #{accessor} exists")
+                reference[accessor] = value
+            return
 
 
-    move = (root, from, to) ->
-        # Get value
-        obj = from.getObject(root)
-        acc = from.accessor
+    class RemovePatch extends JSONPatch
+        apply: (document) ->
+            reference = @path.getReference(document)
+            accessor = @path.accessor
 
-        if isArray(obj)
-            acc = parseInt(acc, 10)
-            if acc not of obj
-                throw new PatchConflictError("Value at #{acc} does not exist")
-            value = obj.splice(acc, 1)[0]
-        else
-            if acc not of obj
-                throw new PatchConflictError("Value at #{acc} does not exist")
-            value = obj[acc]
-            delete obj[acc]
+            if isArray(reference)
+                accessor = parseInt(accessor, 10)
+                if accessor not of reference
+                    throw new PatchConflictError("Value at #{accessor} does not exist")
+                reference.splice(accessor, 1)
+            else
+                if accessor not of reference
+                    throw new PatchConflictError("Value at #{accessor} does not exist")
+                delete reference[accessor]
+            return
 
-        obj = to.getObject(root)
-        acc = to.accessor
 
-        # Add to object
-        if isArray(obj)
-            acc = parseInt(acc, 10)
-            if acc < 0 or acc > obj.length
-                throw new PatchConflictError("Index #{acc} out of bounds")
-            obj.splice(acc, 0, value)
-        else
-            if acc of obj
-                throw new PatchConflictError("Value at #{acc} exists")
-            obj[acc] = value
-        return
+    class ReplacePatch extends JSONPatch
+        validate: (patch) ->
+            if 'value' not of patch then throw new InvalidPatchError()
+
+        apply: (document) ->
+            reference = @path.getReference(document)
+            accessor = @path.accessor
+            value = @patch.value
+
+            if isArray(reference)
+                accessor = parseInt(accessor, 10)
+                if accessor not of reference
+                    throw new PatchConflictError("Value at #{accessor} does not exist")
+                reference.splice(accessor, 1, value)
+            else
+                if accessor not of reference
+                    throw new PatchConflictError("Value at #{accessor} does not exist")
+                reference[accessor] = value
+            return
+
+
+    class TestPatch extends JSONPatch
+        validate: (patch) ->
+            if 'value' not of patch then throw new InvalidPatchError()
+
+        apply: (document) ->
+            reference = @path.getReference(document)
+            accessor = @path.accessor
+            value = @patch.value
+
+            if isArray(reference)
+                accessor = parseInt(accessor, 10)
+            return isEqual(reference[accessor], value)
+
+
+    class MovePatch extends JSONPatch
+        initialize: (patch) ->
+            @to = new JSONPointer(patch.to)
+            len = @path.steps.length
+
+            within = true
+            for i in [0..len]
+                if @path.steps[i] isnt @to.steps[i]
+                    within = false
+                    break
+
+            if within
+                if @to.steps.length isnt len
+                    throw new InvalidPatchError("'to' member cannot be a descendent of 'path'")
+                if @path.accessor is @to.accessor
+                    # The path and to pointers reference the same location,
+                    # therefore apply can be a no-op
+                    @apply = ->
+
+        validate: (patch) ->
+            if 'to' not of patch then throw new InvalidPatchError()
+
+        apply: (document) ->
+            reference = @path.getReference(document)
+            accessor = @path.accessor
+
+            if isArray(reference)
+                accessor = parseInt(accessor, 10)
+                if accessor not of reference
+                    throw new PatchConflictError("Value at #{accessor} does not exist")
+                value = reference.splice(accessor, 1)[0]
+            else
+                if accessor not of reference
+                    throw new PatchConflictError("Value at #{accessor} does not exist")
+                value = reference[accessor]
+                delete reference[accessor]
+
+            reference = @to.getReference(document)
+            accessor = @to.accessor
+
+            # Add to object
+            if isArray(reference)
+                accessor = parseInt(accessor, 10)
+                if accessor < 0 or accessor > reference.length
+                    throw new PatchConflictError("Index #{accessor} out of bounds")
+                reference.splice(accessor, 0, value)
+            else
+                if accessor of reference
+                    throw new PatchConflictError("Value at #{accessor} exists")
+                reference[accessor] = value
+            return
 
     
-    copy = (root, from, to) ->
-        # Get value
-        obj = from.getObject(root)
-        acc = from.accessor
+    class CopyPatch extends MovePatch
+        apply: (document) ->
+            reference = @path.getReference(document)
+            accessor = @path.accessor
 
-        if isArray(obj)
-            acc = parseInt(acc, 10)
-            if acc not of obj
-                throw new PatchConflictError("Value at #{acc} does not exist")
-            value = obj.slice(acc, acc + 1)[0]
-        else
-            if acc not of obj
-                throw new PatchConflictError("Value at #{acc} does not exist")
-            value = obj[acc]
+            if isArray(reference)
+                accessor = parseInt(accessor, 10)
+                if accessor not of reference
+                    throw new PatchConflictError("Value at #{accessor} does not exist")
+                value = reference.slice(accessor, accessor + 1)[0]
+            else
+                if accessor not of reference
+                    throw new PatchConflictError("Value at #{accessor} does not exist")
+                value = reference[accessor]
 
-        obj = to.getObject(root)
-        acc = to.accessor
+            reference = @to.getReference(document)
+            accessor = @to.accessor
 
-        # Add to object
-        if isArray(obj)
-            acc = parseInt(acc, 10)
-            if acc < 0 or acc > obj.length
-                throw new PatchConflictError("Index #{acc} out of bounds")
-            obj.splice(acc, 0, value)
-        else
-            if acc of obj
-                throw new PatchConflictError("Value at #{acc} exists")
-            obj[acc] = value
-        return
+            # Add to object
+            if isArray(reference)
+                accessor = parseInt(accessor, 10)
+                if accessor < 0 or accessor > reference.length
+                    throw new PatchConflictError("Index #{accessor} out of bounds")
+                reference.splice(accessor, 0, value)
+            else
+                if accessor of reference
+                    throw new PatchConflictError("Value at #{accessor} exists")
+                reference[accessor] = value
+            return
 
-    # Map of API functions
-    methodMap =
-        add: add
-        remove: remove
-        replace: replace
-        move: move
-        copy: copy
-        test: test
 
-    # Map of operations and their supplemtary member
-    operationMembers =
-        add: 'value'
-        remove: null
-        replace: 'value'
-        test: 'value'
-        copy: 'to'
-        move: 'to'
+    # Map of operation classes
+    operationMap =
+        add: AddPatch
+        remove: RemovePatch
+        replace: ReplacePatch
+        move: MovePatch
+        copy: CopyPatch
+        test: TestPatch
 
-    # Map of operation member pre-processors
-    memberProcessors =
-        move: (to) -> new JSONPointer(to)
-        copy: (to) -> new JSONPointer(to)
 
-    apply = (root, patchDocument) ->
-        compile(patchDocument)(root)
+    # Validates and compiles a patch document and returns a function to apply
+    # to multiple documents
+    compile = (patch) ->
+        ops = []
 
-    compile = (patchDocument) ->
-        operations = []
-        for patch in patchDocument
-            operations.push new JSONPatch(patch)
+        for p in patch
+            # Not a valid operation
+            if not (klass = operationMap[p.op])
+                throw new InvalidPatchError()
+            ops.push new klass(p)
 
-        return (root) ->
-            for op in operations
-                result = op.apply(root)
+        return (document) ->
+            for op in ops
+                result = op.apply(document)
             return result
+
+
+    # Applies a patch to a document
+    apply = (document, patch) ->
+        compile(patch)(document)
+
 
     # Export to root
     root.apply = apply
     root.compile = compile
     root.JSONPatchError = JSONPatchError
+    root.InvalidPointerError = InvalidPointerError
     root.InvalidPatchError = InvalidPatchError
     root.PatchConflictError = PatchConflictError
     return root

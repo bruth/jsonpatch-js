@@ -1,7 +1,7 @@
 # jsonpatch.js
 
 Library to apply JSON Patches in JavaScript
-http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-03
+http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-06
 
 jsonpatch.js works as in the browser as a script, as a Node module and as an
 AMD module.
@@ -30,98 +30,100 @@ Note: all operations are applied in-place.
 
 **`jsonpatch.apply(document, patch)`**
 
-:   Applies a patch to the document
+Applies a patch to the document
 
 **`jsonpatch.compile(patch)`**
 
-:   Compiles a patch and returns a function that takes a document to apply the patch to.
+Compiles a patch and returns a function that takes a document to apply the patch to.
 
 ## Patch Operations
 
 ### Add
 
-Patch syntax: `{add: <path>, value: <value>}`
+Patch syntax: `{op: 'add', path: <path>, value: <value>}`
 
 ```javascript
 // Add property, result: {foo: 'bar'}
-jsonpatch.apply({}, [{add: '/foo', value: 'bar'}]);
+jsonpatch.apply({}, [{op: 'add', path: '/foo', value: 'bar'}]);
 
 // Add array element, result: {foo: [1, 2, 3]}
-jsonpatch.apply({foo: [1, 3]}, [{add: '/foo/1', value: 2}]);
+jsonpatch.apply({foo: [1, 3]}, [{op: 'add', path: '/foo/1', value: 2}]);
 
 // Complex, result: {foo: [{bar: 'baz'}]}
-jsonpatch.apply({foo: [{}]}, [{add: '/foo/0/bar', value: 'baz'}]);
+jsonpatch.apply({foo: [{}]}, [{op: 'add', path: '/foo/0/bar', value: 'baz'}]);
 ```
 
 ### Remove
 
-Patch syntax: `{remove: <path>}`
+Patch syntax: `{op: 'remove', path: <path>}`
 
 ```javascript
 // Remove property, result: {}
-jsonpatch.apply({foo: 'bar'}, [{remove: '/foo'}]);
+jsonpatch.apply({foo: 'bar'}, [{op: 'remove', path: '/foo'}]);
 
 // Remove array element, result: {foo: [1, 3]}
-jsonpatch.apply({foo: [1, 2, 3]}, [{remove: '/foo/1'}]);
+jsonpatch.apply({foo: [1, 2, 3]}, [{op: 'remove', path: '/foo/1'}]);
 
 // Complex, result: {foo: [{}]}
-jsonpatch.apply({foo: [{bar: 'baz'}]}, [{remove: '/foo/0/bar'}]);
+jsonpatch.apply({foo: [{bar: 'baz'}]}, [{op: 'remove', path: '/foo/0/bar'}]);
 ```
 
 ### Replace
 
-Patch syntax: `{replace: <path>, value: <value>}`
+Patch syntax: `{op: 'replace', path: <path>, value: <value>}`
 
 ```javascript
 // Replace property, result: {foo: 1}
-jsonpatch.apply({foo: 'bar'}, [{replace: '/foo', value: 1}]);
+jsonpatch.apply({foo: 'bar'}, [{op: 'replace', path: '/foo', value: 1}]);
 
 // Repalce array element, result: {foo: [1, 4, 3]}
-jsonpatch.apply({foo: [1, 2, 3]}, [{replace: '/foo/1', value: 4}]);
+jsonpatch.apply({foo: [1, 2, 3]}, [{op: 'replace', path: '/foo/1', value: 4}]);
 
 // Complex, result: {foo: [{bar: 1}]}
-jsonpatch.apply({foo: [{bar: 'baz'}]}, [{replace: '/foo/0/bar', value: 1}]);
+jsonpatch.apply({foo: [{bar: 'baz'}]}, [{op: 'replace', path: '/foo/0/bar', value: 1}]);
 ```
 
 ### Move
 
-Patch syntax: `{move: <path>, to: <path>}`
+Patch syntax: `{op: 'move', path: <path>, to: <path>}`
 
 ```javascript
 // Move property, result {bar: [1, 2, 3]}
-jsonpatch.apply({foo: [1, 2, 3]}, [{move: '/foo', to: '/bar'}]);
+jsonpatch.apply({foo: [1, 2, 3]}, [{op: 'move', path: '/foo', to: '/bar'}]);
 ```
 
 ### Copy
 
-Patch syntax: `{copy: <path>, to: <path>}`
+Patch syntax: `{op: 'copy', path: <path>, to: <path>}`
 
 ```javascript
 // Copy property, result {foo: [1, 2, 3], bar: 2}
-jsonpatch.apply({foo: [1, 2, 3]}, [{copy: '/foo/1', to: '/bar'}]);
+jsonpatch.apply({foo: [1, 2, 3]}, [{op: 'copy', path: '/foo/1', to: '/bar'}]);
 ```
 
 ### Test
 
-Patch syntax: `{test: <path>, value: <value>}`
+Patch syntax: `{op: 'test', path: <path>, value: <value>}`
 
 ```javascript
-// Test property, result: true
-jsonpatch.apply({foo: 'bar'}, [{test: '/foo', value: 'bar'}]
+// Test equality of property to value, result: true
+jsonpatch.apply({foo: 'bar'}, [{op: 'test', path: '/foo', value: 'bar'}]
 ```
 
 ## Error Types
 
 **`JSONPatchError`**
 
-:   Base error type which all patch errors extend from.
+Base error type which all patch errors extend from.
+
+**`InvalidPointerError`**
+
+Thrown when the pointer is invalid.
 
 **`InvalidPatchError`**
 
-:   Thrown when the patch itself has an invalid syntax.
+Thrown when the patch itself has an invalid syntax.
 
 **`PatchConflictError`**
 
-:   Thrown when there is a conflic with applying the patch to the document.
-
-
+Thrown when there is a conflic with applying the patch to the document.

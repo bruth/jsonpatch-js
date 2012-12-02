@@ -1,57 +1,57 @@
 var obj, compiled;
 
 // QUnit
-test('general', function() {
-    raises(function() {
+test('invalid patches', function() {
+    throws(function() {
         jsonpatch.apply({}, [{foo: '/bar'}]);
     }, jsonpatch.InvalidPatchError, 'Bad operation');
 
-    raises(function() {
-        jsonpatch.apply({}, [{add: ''}]);
+    throws(function() {
+        jsonpatch.apply({}, [{op: 'add', path: ''}]);
     }, jsonpatch.InvalidPatchError, 'Path must start with a /');
 });
 
 test('add', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
-    jsonpatch.apply(obj, [{add: '/bar', value: [1, 2, 3, 4]}]);
+    jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: [1, 2, 3, 4]}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]});
 
-    jsonpatch.apply(obj, [{add: '/baz/0/foo', value: 'world'}]);
+    jsonpatch.apply(obj, [{op: 'add', path: '/baz/0/foo', value: 'world'}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello', foo: 'world'}], bar: [1, 2, 3, 4]});
 
     raises(function() {
-        jsonpatch.apply(obj, [{add: '/bar/8', value: '5'}]);
+        jsonpatch.apply(obj, [{op: 'add', path: '/bar/8', value: '5'}]);
     }, jsonpatch.PatchConflictError, 'Out of bounds (upper)');
 
     raises(function() {
-        jsonpatch.apply(obj, [{add: '/bar/-1', value: '5'}]);
+        jsonpatch.apply(obj, [{op: 'add', path: '/bar/-1', value: '5'}]);
     }, jsonpatch.PatchConflictError, 'Out of bounds (lower)');
 
     raises(function() {
-        jsonpatch.apply(obj, [{add: '/bar/8', value: undefined}]);
+        jsonpatch.apply(obj, [{op: 'add', path: '/bar/8'}]);
     }, jsonpatch.InvalidPatchError, 'Patch member value not defined');
 
     obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{add: '/bar', value: true}]);
+    jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: true}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: true});
 
     obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{add: '/bar', value: false}]);
+    jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: false}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: false});
 
     obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{add: '/bar', value: null}]);
+    jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: null}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: null});
 });
 
 
 test('remove', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{remove: '/bar'}]);
+    jsonpatch.apply(obj, [{op: 'remove', path: '/bar'}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}]});
 
-    jsonpatch.apply(obj, [{remove: '/baz/0/qux'}]);
+    jsonpatch.apply(obj, [{op: 'remove', path: '/baz/0/qux'}]);
     deepEqual(obj, {foo: 1, baz: [{}]});
 });
 
@@ -59,28 +59,28 @@ test('remove', function() {
 test('replace', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
-    jsonpatch.apply(obj, [{replace: '/foo', value: [1, 2, 3, 4]}]);
+    jsonpatch.apply(obj, [{op: 'replace', path: '/foo', value: [1, 2, 3, 4]}]);
     deepEqual(obj, {foo: [1, 2, 3, 4], baz: [{qux: 'hello'}]});
 
-    jsonpatch.apply(obj, [{replace: '/baz/0/qux', value: 'world'}]);
+    jsonpatch.apply(obj, [{op: 'replace', path: '/baz/0/qux', value: 'world'}]);
     deepEqual(obj, {foo: [1, 2, 3, 4], baz: [{qux: 'world'}]});
 });
 
 
 test('test', function() {
     obj = {foo: {bar: [1, 2, 5, 4]}};
-    ok(jsonpatch.apply(obj, [{test: '/foo', value: {bar: [1, 2, 5, 4]}}]));
-    ok(!jsonpatch.apply(obj, [{test: '/foo', value: [1, 2]}]));
+    ok(jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: {bar: [1, 2, 5, 4]}}]));
+    ok(!jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: [1, 2]}]));
 });
 
 
 test('move', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
-    jsonpatch.apply(obj, [{move: '/foo', to: '/bar'}]);
+    jsonpatch.apply(obj, [{op: 'move', path: '/foo', to: '/bar'}]);
     deepEqual(obj, {baz: [{qux: 'hello'}], bar: 1});
 
-    jsonpatch.apply(obj, [{move: '/baz/0/qux', to: '/baz/1'}]);
+    jsonpatch.apply(obj, [{op: 'move', path: '/baz/0/qux', to: '/baz/1'}]);
     deepEqual(obj, {baz: [{}, 'hello'], bar: 1});
 });
 
@@ -88,10 +88,10 @@ test('move', function() {
 test('copy', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
-    jsonpatch.apply(obj, [{copy: '/foo', to: '/bar'}]);
+    jsonpatch.apply(obj, [{op: 'copy', path: '/foo', to: '/bar'}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: 1});
 
-    jsonpatch.apply(obj, [{copy: '/baz/0/qux', to: '/baz/1'}]);
+    jsonpatch.apply(obj, [{op: 'copy', path: '/baz/0/qux', to: '/baz/1'}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}, 'hello'], bar: 1});
 });
 
@@ -100,67 +100,67 @@ test('copy', function() {
 // JSLitmus
 JSLitmus.test('Add Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{add: '/bar', value: [1, 2, 3, 4]}]);
+    jsonpatch.apply(obj, [{op: 'add', path: '/bar', value: [1, 2, 3, 4]}]);
 });
 
 JSLitmus.test('Remove Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{remove: '/bar'}]);
+    jsonpatch.apply(obj, [{op: 'remove', path: '/bar'}]);
 });
 
 JSLitmus.test('Replace Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{replace: '/foo', value: [1, 2, 3, 4]}]);
+    jsonpatch.apply(obj, [{op: 'replace', path: '/foo', value: [1, 2, 3, 4]}]);
 });
 
 JSLitmus.test('Move Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{move: '/baz/0', to: '/bar/0'}]);
+    jsonpatch.apply(obj, [{op: 'move', path: '/baz/0', to: '/bar/0'}]);
 });
 
 JSLitmus.test('Copy Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{copy: '/baz/0', to: '/bar/0'}]);
+    jsonpatch.apply(obj, [{op: 'copy', path: '/baz/0', to: '/bar/0'}]);
 });
 
 
 JSLitmus.test('Test Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
-    jsonpatch.apply(obj, [{test: '/baz', value: [{qux: 'hello'}]}]);
+    jsonpatch.apply(obj, [{op: 'test', path: '/baz', value: [{qux: 'hello'}]}]);
 });
 
-var addCompiled = jsonpatch.compile([{add: '/bar', value: [1, 2, 3, 4]}]);
+var addCompiled = jsonpatch.compile([{op: 'add', path: '/bar', value: [1, 2, 3, 4]}]);
 JSLitmus.test('Compiled Add Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
     addCompiled(obj);
 });
 
-var removeCompiled = jsonpatch.compile([{remove: '/bar'}]);
+var removeCompiled = jsonpatch.compile([{op: 'remove', path: '/bar'}]);
 JSLitmus.test('Compiled Remove Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
     removeCompiled(obj);
 });
 
-var replaceCompiled = jsonpatch.compile([{replace: '/foo', value: [1, 2, 3, 4]}]);
+var replaceCompiled = jsonpatch.compile([{op: 'replace', path: '/foo', value: [1, 2, 3, 4]}]);
 JSLitmus.test('Compiled Replace Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
     replaceCompiled(obj);
 });
 
-var moveCompiled = jsonpatch.compile([{move: '/baz/0', to: '/bar/0'}]);
+var moveCompiled = jsonpatch.compile([{op: 'move', path: '/baz/0', to: '/bar/0'}]);
 JSLitmus.test('Compiled Move Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
     moveCompiled(obj);
 });
 
-var copyCompiled = jsonpatch.compile([{copy: '/baz/0', to: '/bar/0'}]);
+var copyCompiled = jsonpatch.compile([{op: 'copy', path: '/baz/0', to: '/bar/0'}]);
 JSLitmus.test('Compiled Copy Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
     copyCompiled(obj);
 });
 
 
-var testCompiled = jsonpatch.compile([{test: '/baz', value: [{qux: 'hello'}]}]);
+var testCompiled = jsonpatch.compile([{op: 'test', path: '/baz', value: [{qux: 'hello'}]}]);
 JSLitmus.test('Compiled Test Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
     testCompiled(obj);
