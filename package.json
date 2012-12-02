@@ -1,15 +1,9 @@
 {
-  "name": "jsonpatch-js",
-  "version": "0.1.0",
+  "name": "json-patch",
+  "author": "Byron Ruth <b@devel.io>",
+  "version": "0.2.3",
   "description": "A JavaScript implementation of the JSON Media Type for partial modifications: http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-03",
-  "main": "jsonpatch.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/bruth/jsonpatch-js.git"
-  },
+  "license": "BSD",
   "keywords": [
     "diff",
     "patch",
@@ -17,6 +11,12 @@
     "jsonpatch",
     "jsonpointer"
   ],
-  "author": "Byron Ruth <b@devel.io>",
-  "license": "BSD"
+  "main": "jsonpatch.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bruth/jsonpatch-js.git"
+  }
 }
