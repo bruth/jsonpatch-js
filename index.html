@@ -31,71 +31,120 @@
           <h2>JSON Patch for JavaScript</h2>
 
 <p>Library to apply JSON Patches in JavaScript
-<a href="http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-03">http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-03</a></p>
+<a href="http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-06">http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-06</a></p>
 
-<p>For convenience, <code>jsonpatch.apply</code> can take a patch as an object
-or an array of objects. The spec states the latter as being the official
-patch syntax.</p>
+<p>jsonpatch.js works as in the browser as a script, as a Node module and as an
+AMD module.</p>
 
-<p><strong>Note: all operations are applied in-place.</strong></p>
+<h2>Install</h2>
+
+<p><strong>Bower</strong></p>
+
+<pre><code>bower install json-patch
+</code></pre>
+
+<p><strong>NPM</strong></p>
+
+<pre><code>npm install json-patch
+</code></pre>
+
+<p><strong>Note: at this time, all operations are applied in-place.</strong></p>
+
+<h2>Methods</h2>
+
+<p><strong><code>jsonpatch.apply(document, patch)</code></strong></p>
+
+<p>Applies a patch to the document</p>
+
+<p><strong><code>jsonpatch.compile(patch)</code></strong></p>
+
+<p>Compiles a patch and returns a function that takes a document to apply the patch to.</p>
+
+<h2>Patch Operations</h2>
 
 <h3>Add</h3>
 
-<p>Patch syntax: <code>{add: &lt;path&gt;, value: &lt;value&gt;}</code></p>
+<p>Patch syntax: <code>{op: 'add', path: &lt;path&gt;, value: &lt;value&gt;}</code></p>
 
 <div class="highlight"><pre><span class="c1">// Add property, result: {foo: 'bar'}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({},</span> <span class="p">[{</span><span class="nx">add</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'add'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">}]);</span>
 
 <span class="c1">// Add array element, result: {foo: [1, 2, 3]}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">add</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">2</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'add'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">2</span><span class="p">}]);</span>
 
 <span class="c1">// Complex, result: {foo: [{bar: 'baz'}]}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{}]},</span> <span class="p">[{</span><span class="nx">add</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{}]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'add'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]);</span>
 </pre></div>
 
 <h3>Remove</h3>
 
-<p>Patch syntax: <code>{remove: &lt;path&gt;}</code></p>
+<p>Patch syntax: <code>{op: 'remove', path: &lt;path&gt;}</code></p>
 
 <div class="highlight"><pre><span class="c1">// Remove property, result: {}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">remove</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'remove'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">}]);</span>
 
 <span class="c1">// Remove array element, result: {foo: [1, 3]}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">remove</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'remove'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">}]);</span>
 
 <span class="c1">// Complex, result: {foo: [{}]}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{</span><span class="nx">bar</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]},</span> <span class="p">[{</span><span class="nx">remove</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{</span><span class="nx">bar</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'remove'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">}]);</span>
 </pre></div>
 
 <h3>Replace</h3>
 
-<p>Patch syntax: <code>{replace: &lt;path&gt;, value: &lt;value&gt;}</code></p>
+<p>Patch syntax: <code>{op: 'replace', path: &lt;path&gt;, value: &lt;value&gt;}</code></p>
 
 <div class="highlight"><pre><span class="c1">// Replace property, result: {foo: 1}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">replace</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">1</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'replace'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">1</span><span class="p">}]);</span>
 
 <span class="c1">// Repalce array element, result: {foo: [1, 4, 3]}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">replace</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">4</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'replace'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">4</span><span class="p">}]);</span>
 
 <span class="c1">// Complex, result: {foo: [{bar: 1}]}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{</span><span class="nx">bar</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]},</span> <span class="p">[{</span><span class="nx">replace</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">1</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{</span><span class="nx">bar</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'replace'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">1</span><span class="p">}]);</span>
 </pre></div>
 
 <h3>Move</h3>
 
-<p>Patch syntax: <code>{move: &lt;path&gt;, to: &lt;path&gt;}</code></p>
+<p>Patch syntax: <code>{op: 'move', path: &lt;path&gt;, to: &lt;path&gt;}</code></p>
 
 <div class="highlight"><pre><span class="c1">// Move property, result {bar: [1, 2, 3]}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">move</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">to</span><span class="o">:</span> <span class="s1">'/bar'</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'move'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">to</span><span class="o">:</span> <span class="s1">'/bar'</span><span class="p">}]);</span>
+</pre></div>
+
+<h3>Copy</h3>
+
+<p>Patch syntax: <code>{op: 'copy', path: &lt;path&gt;, to: &lt;path&gt;}</code></p>
+
+<div class="highlight"><pre><span class="c1">// Copy property, result {foo: [1, 2, 3], bar: 2}</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'copy'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">,</span> <span class="nx">to</span><span class="o">:</span> <span class="s1">'/bar'</span><span class="p">}]);</span>
 </pre></div>
 
 <h3>Test</h3>
 
-<p>Patch syntax: <code>{test: &lt;path&gt;, value: &lt;value&gt;}</code></p>
+<p>Patch syntax: <code>{op: 'test', path: &lt;path&gt;, value: &lt;value&gt;}</code></p>
 
-<div class="highlight"><pre><span class="c1">// Test property, result: true</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">test</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">}]</span>
+<div class="highlight"><pre><span class="c1">// Test equality of property to value, result: true</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'test'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">}]</span>
 </pre></div>
+
+<h2>Error Types</h2>
+
+<p><strong><code>JSONPatchError</code></strong></p>
+
+<p>Base error type which all patch errors extend from.</p>
+
+<p><strong><code>InvalidPointerError</code></strong></p>
+
+<p>Thrown when the pointer is invalid.</p>
+
+<p><strong><code>InvalidPatchError</code></strong></p>
+
+<p>Thrown when the patch itself has an invalid syntax.</p>
+
+<p><strong><code>PatchConflictError</code></strong></p>
+
+<p>Thrown when there is a conflic with applying the patch to the document.</p>
         </section>
 
         <aside id="sidebar">
