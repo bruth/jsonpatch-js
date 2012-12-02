@@ -309,9 +309,6 @@
     };
     copy = function(root, from, to) {
       var acc, obj, value;
-      if (to === void 0) {
-        throw new InvalidPatchError("Patch member 'to' not defined");
-      }
       obj = from.getObject(root);
       acc = from.accessor;
       if (isArray(obj)) {

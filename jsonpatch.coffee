@@ -61,7 +61,7 @@
         if typeof a isnt 'object' or typeof b isnt 'object' then return false
         # Assume equality for cyclic structures. The algorithm for detecting cyclic
         # structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
-        length = stack.length;
+        length = stack.length
         while length--
             # Linear search. Performance is inversely proportional to the number of
             # unique nested structures.
@@ -262,9 +262,6 @@
 
     
     copy = (root, from, to) ->
-        if to is undefined
-            throw new InvalidPatchError("Patch member 'to' not defined")
-
         # Get value
         obj = from.getObject(root)
         acc = from.accessor
