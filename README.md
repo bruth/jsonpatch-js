@@ -20,11 +20,7 @@ bower install json-patch
 npm install json-patch
 ```
 
-For convenience, `jsonpatch.apply` can take a patch as an object
-or an array of objects. The spec states the latter as being the official
-patch syntax.
-
-Note: all operations are applied in-place.
+**Note: at this time, all operations are applied in-place.**
 
 ## Methods
 

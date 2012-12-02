@@ -1,8 +1,8 @@
 {
   "name": "json-patch",
   "author": "Byron Ruth <b@devel.io>",
-  "version": "0.2.3",
-  "description": "A JavaScript implementation of the JSON Media Type for partial modifications: http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-03",
+  "version": "0.3.0",
+  "description": "A JavaScript implementation of the JSON Media Type for partial modifications: http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-06",
   "license": "BSD",
   "keywords": [
     "diff",

@@ -1,5 +1,5 @@
 # jsonpatch.js 0.3.0
-# (c) 2011 Byron Ruth
+# (c) 2011-2012 Byron Ruth
 # jsonpatch may be freely distributed under the BSD license
 
 ((root, factory) ->
