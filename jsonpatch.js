@@ -161,12 +161,12 @@
       function JSONPointer(path) {
         var i, step, steps, _i, _len;
         steps = [];
-        if (path && (steps = path.split('/')).shift() !== '') {
+        if (path && (steps = decodeURIComponent(path).split('/')).shift() !== '') {
           throw new InvalidPointerError();
         }
         for (i = _i = 0, _len = steps.length; _i < _len; i = ++_i) {
           step = steps[i];
-          steps[i] = decodeURIComponent(step).replace('~0', '~').replace('~1', '/');
+          steps[i] = step.replace('~1', '/').replace('~0', '~');
         }
         this.accessor = steps.pop();
         this.steps = steps;

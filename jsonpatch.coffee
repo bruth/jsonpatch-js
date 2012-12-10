@@ -1,4 +1,4 @@
-# jsonpatch.js 0.3.0
+# jsonpatch.js 0.3.1
 # (c) 2011-2012 Byron Ruth
 # jsonpatch may be freely distributed under the BSD license
 
@@ -128,12 +128,12 @@
         constructor: (path) ->
             steps = []
             # If a path is specified, it must start with a /
-            if path and (steps = path.split '/').shift() isnt ''
+            if path and (steps = decodeURIComponent(path).split '/').shift() isnt ''
                 throw new InvalidPointerError()
 
             # Decode each component, decode JSON Pointer specific syntax ~0 and ~1
             for step, i in steps
-                steps[i] = decodeURIComponent(step).replace('~0', '~').replace('~1', '/')
+                steps[i] = step.replace('~1', '/').replace('~0', '~')
 
             # The final segment is the accessor (property/index) of the object
             # the pointer ultimately references
