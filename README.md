@@ -1,7 +1,7 @@
 # jsonpatch.js
 
 Library to apply JSON Patches in JavaScript
-http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-06
+http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-08
 
 jsonpatch.js works as in the browser as a script, as a Node module and as an
 AMD module.
@@ -81,20 +81,20 @@ jsonpatch.apply({foo: [{bar: 'baz'}]}, [{op: 'replace', path: '/foo/0/bar', valu
 
 ### Move
 
-Patch syntax: `{op: 'move', path: <path>, to: <path>}`
+Patch syntax: `{op: 'move', from: <path>, path: <path>}`
 
 ```javascript
 // Move property, result {bar: [1, 2, 3]}
-jsonpatch.apply({foo: [1, 2, 3]}, [{op: 'move', path: '/foo', to: '/bar'}]);
+jsonpatch.apply({foo: [1, 2, 3]}, [{op: 'move', from: '/foo', path: '/bar'}]);
 ```
 
 ### Copy
 
-Patch syntax: `{op: 'copy', path: <path>, to: <path>}`
+Patch syntax: `{op: 'copy', from: <path>, path: <path>}`
 
 ```javascript
 // Copy property, result {foo: [1, 2, 3], bar: 2}
-jsonpatch.apply({foo: [1, 2, 3]}, [{op: 'copy', path: '/foo/1', to: '/bar'}]);
+jsonpatch.apply({foo: [1, 2, 3]}, [{op: 'copy', from: '/foo/1', path: '/bar'}]);
 ```
 
 ### Test

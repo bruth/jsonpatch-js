@@ -358,35 +358,35 @@
 
       MovePatch.prototype.initialize = function(patch) {
         var i, len, within, _i;
-        this.to = new JSONPointer(patch.to);
-        len = this.path.steps.length;
+        this.from = new JSONPointer(patch.from);
+        len = this.from.steps.length;
         within = true;
         for (i = _i = 0; 0 <= len ? _i <= len : _i >= len; i = 0 <= len ? ++_i : --_i) {
-          if (this.path.steps[i] !== this.to.steps[i]) {
+          if (this.from.steps[i] !== this.path.steps[i]) {
             within = false;
             break;
           }
         }
         if (within) {
-          if (this.to.steps.length !== len) {
+          if (this.path.steps.length !== len) {
             throw new InvalidPatchError("'to' member cannot be a descendent of 'path'");
           }
-          if (this.path.accessor === this.to.accessor) {
+          if (this.from.accessor === this.path.accessor) {
             return this.apply = function() {};
           }
         }
       };
 
       MovePatch.prototype.validate = function(patch) {
-        if (!('to' in patch)) {
+        if (!('from' in patch)) {
           throw new InvalidPatchError();
         }
       };
 
       MovePatch.prototype.apply = function(document) {
         var accessor, reference, value;
-        reference = this.path.getReference(document);
-        accessor = this.path.accessor;
+        reference = this.from.getReference(document);
+        accessor = this.from.accessor;
         if (isArray(reference)) {
           accessor = parseInt(accessor, 10);
           if (!(accessor in reference)) {
@@ -400,8 +400,8 @@
           value = reference[accessor];
           delete reference[accessor];
         }
-        reference = this.to.getReference(document);
-        accessor = this.to.accessor;
+        reference = this.path.getReference(document);
+        accessor = this.path.accessor;
         if (isArray(reference)) {
           accessor = parseInt(accessor, 10);
           if (accessor < 0 || accessor > reference.length) {
@@ -429,8 +429,8 @@
 
       CopyPatch.prototype.apply = function(document) {
         var accessor, reference, value;
-        reference = this.path.getReference(document);
-        accessor = this.path.accessor;
+        reference = this.from.getReference(document);
+        accessor = this.from.accessor;
         if (isArray(reference)) {
           accessor = parseInt(accessor, 10);
           if (!(accessor in reference)) {
@@ -443,8 +443,8 @@
           }
           value = reference[accessor];
         }
-        reference = this.to.getReference(document);
-        accessor = this.to.accessor;
+        reference = this.path.getReference(document);
+        accessor = this.path.accessor;
         if (isArray(reference)) {
           accessor = parseInt(accessor, 10);
           if (accessor < 0 || accessor > reference.length) {

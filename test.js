@@ -77,10 +77,10 @@ test('test', function() {
 test('move', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
-    jsonpatch.apply(obj, [{op: 'move', path: '/foo', to: '/bar'}]);
+    jsonpatch.apply(obj, [{op: 'move', from: '/foo', path: '/bar'}]);
     deepEqual(obj, {baz: [{qux: 'hello'}], bar: 1});
 
-    jsonpatch.apply(obj, [{op: 'move', path: '/baz/0/qux', to: '/baz/1'}]);
+    jsonpatch.apply(obj, [{op: 'move', from: '/baz/0/qux', path: '/baz/1'}]);
     deepEqual(obj, {baz: [{}, 'hello'], bar: 1});
 });
 
@@ -88,10 +88,10 @@ test('move', function() {
 test('copy', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}]};
 
-    jsonpatch.apply(obj, [{op: 'copy', path: '/foo', to: '/bar'}]);
+    jsonpatch.apply(obj, [{op: 'copy', from: '/foo', path: '/bar'}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}], bar: 1});
 
-    jsonpatch.apply(obj, [{op: 'copy', path: '/baz/0/qux', to: '/baz/1'}]);
+    jsonpatch.apply(obj, [{op: 'copy', from: '/baz/0/qux', path: '/baz/1'}]);
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}, 'hello'], bar: 1});
 });
 
@@ -115,12 +115,12 @@ JSLitmus.test('Replace Operation', function() {
 
 JSLitmus.test('Move Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{op: 'move', path: '/baz/0', to: '/bar/0'}]);
+    jsonpatch.apply(obj, [{op: 'move', from: '/baz/0', path: '/bar/0'}]);
 });
 
 JSLitmus.test('Copy Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
-    jsonpatch.apply(obj, [{op: 'copy', path: '/baz/0', to: '/bar/0'}]);
+    jsonpatch.apply(obj, [{op: 'copy', from: '/baz/0', path: '/bar/0'}]);
 });
 
 
@@ -147,13 +147,13 @@ JSLitmus.test('Compiled Replace Operation', function() {
     replaceCompiled(obj);
 });
 
-var moveCompiled = jsonpatch.compile([{op: 'move', path: '/baz/0', to: '/bar/0'}]);
+var moveCompiled = jsonpatch.compile([{op: 'move', from: '/baz/0', path: '/bar/0'}]);
 JSLitmus.test('Compiled Move Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
     moveCompiled(obj);
 });
 
-var copyCompiled = jsonpatch.compile([{op: 'copy', path: '/baz/0', to: '/bar/0'}]);
+var copyCompiled = jsonpatch.compile([{op: 'copy', from: '/baz/0', path: '/bar/0'}]);
 JSLitmus.test('Compiled Copy Operation', function() {
     obj = {foo: 1, baz: [{qux: 'hello'}], bar: [1, 2, 3, 4]};
     copyCompiled(obj);

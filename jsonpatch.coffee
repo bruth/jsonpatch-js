@@ -1,4 +1,4 @@
-# jsonpatch.js 0.3.1
+# jsonpatch.js 0.3.2
 # (c) 2011-2012 Byron Ruth
 # jsonpatch may be freely distributed under the BSD license
 
@@ -252,29 +252,29 @@
 
     class MovePatch extends JSONPatch
         initialize: (patch) ->
-            @to = new JSONPointer(patch.to)
-            len = @path.steps.length
+            @from = new JSONPointer(patch.from)
+            len = @from.steps.length
 
             within = true
             for i in [0..len]
-                if @path.steps[i] isnt @to.steps[i]
+                if @from.steps[i] isnt @path.steps[i]
                     within = false
                     break
 
             if within
-                if @to.steps.length isnt len
+                if @path.steps.length isnt len
                     throw new InvalidPatchError("'to' member cannot be a descendent of 'path'")
-                if @path.accessor is @to.accessor
+                if @from.accessor is @path.accessor
                     # The path and to pointers reference the same location,
                     # therefore apply can be a no-op
                     @apply = ->
 
         validate: (patch) ->
-            if 'to' not of patch then throw new InvalidPatchError()
+            if 'from' not of patch then throw new InvalidPatchError()
 
         apply: (document) ->
-            reference = @path.getReference(document)
-            accessor = @path.accessor
+            reference = @from.getReference(document)
+            accessor = @from.accessor
 
             if isArray(reference)
                 accessor = parseInt(accessor, 10)
@@ -287,8 +287,8 @@
                 value = reference[accessor]
                 delete reference[accessor]
 
-            reference = @to.getReference(document)
-            accessor = @to.accessor
+            reference = @path.getReference(document)
+            accessor = @path.accessor
 
             # Add to object
             if isArray(reference)
@@ -305,8 +305,8 @@
     
     class CopyPatch extends MovePatch
         apply: (document) ->
-            reference = @path.getReference(document)
-            accessor = @path.accessor
+            reference = @from.getReference(document)
+            accessor = @from.accessor
 
             if isArray(reference)
                 accessor = parseInt(accessor, 10)
@@ -318,8 +318,8 @@
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 value = reference[accessor]
 
-            reference = @to.getReference(document)
-            accessor = @to.accessor
+            reference = @path.getReference(document)
+            accessor = @path.accessor
 
             # Add to object
             if isArray(reference)
