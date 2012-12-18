@@ -28,10 +28,10 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h2>JSON Patch for JavaScript</h2>
+          <h1>JSON Patch for JavaScript</h1>
 
 <p>Library to apply JSON Patches in JavaScript
-<a href="http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-06">http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-06</a></p>
+<a href="http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-08">http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-08</a></p>
 
 <p>jsonpatch.js works as in the browser as a script, as a Node module and as an
 AMD module.</p>
@@ -106,18 +106,18 @@ AMD module.</p>
 
 <h3>Move</h3>
 
-<p>Patch syntax: <code>{op: 'move', path: &lt;path&gt;, to: &lt;path&gt;}</code></p>
+<p>Patch syntax: <code>{op: 'move', from: &lt;path&gt;, path: &lt;path&gt;}</code></p>
 
 <div class="highlight"><pre><span class="c1">// Move property, result {bar: [1, 2, 3]}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'move'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">to</span><span class="o">:</span> <span class="s1">'/bar'</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'move'</span><span class="p">,</span> <span class="nx">from</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/bar'</span><span class="p">}]);</span>
 </pre></div>
 
 <h3>Copy</h3>
 
-<p>Patch syntax: <code>{op: 'copy', path: &lt;path&gt;, to: &lt;path&gt;}</code></p>
+<p>Patch syntax: <code>{op: 'copy', from: &lt;path&gt;, path: &lt;path&gt;}</code></p>
 
 <div class="highlight"><pre><span class="c1">// Copy property, result {foo: [1, 2, 3], bar: 2}</span>
-<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'copy'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">,</span> <span class="nx">to</span><span class="o">:</span> <span class="s1">'/bar'</span><span class="p">}]);</span>
+<span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'copy'</span><span class="p">,</span> <span class="nx">from</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/bar'</span><span class="p">}]);</span>
 </pre></div>
 
 <h3>Test</h3>
