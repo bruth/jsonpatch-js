@@ -367,8 +367,11 @@
     # Export to root
     root.apply = apply
     root.compile = compile
+    root.JSONPointer = JSONPointer
+    root.JSONPatch = JSONPatch
     root.JSONPatchError = JSONPatchError
     root.InvalidPointerError = InvalidPointerError
     root.InvalidPatchError = InvalidPatchError
     root.PatchConflictError = PatchConflictError
+
     return root
