@@ -1,5 +1,7 @@
 var obj, compiled;
 
+module('Original Tests');
+
 // QUnit
 test('invalid patches', function() {
     throws(function() {

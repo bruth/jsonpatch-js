@@ -1,4 +1,4 @@
-# jsonpatch.js 0.3.2
+# jsonpatch.js 0.4
 # (c) 2011-2012 Byron Ruth
 # jsonpatch may be freely distributed under the BSD license
 
@@ -128,7 +128,7 @@
         constructor: (path) ->
             steps = []
             # If a path is specified, it must start with a /
-            if path and (steps = decodeURIComponent(path).split '/').shift() isnt ''
+            if path and (steps = path.split '/').shift() isnt ''
                 throw new InvalidPointerError()
 
             # Decode each component, decode JSON Pointer specific syntax ~0 and ~1
@@ -141,7 +141,7 @@
             @steps = steps
             @path = path
 
-            # Returns an object with the object reference and the accessor
+        # Returns an object with the object reference and the accessor
         getReference: (parent) ->
             for step in @steps
                 if isArray parent then step = parseInt(step, 10)
@@ -150,6 +150,20 @@
                         'bounds or not an instance property')
                 parent = parent[step]
             return parent
+
+        # Checks and coerces the accessor relative to the reference
+        # object it will be applied to.
+        coerce: (reference, accessor) ->
+            if isArray(reference)
+                if isString(accessor)
+                    if accessor is '-'
+                        accessor = reference.length
+                    else if /^[-+]?\d+$/.test(accessor)
+                        accessor = parseInt(accessor, 10)
+                    else
+                        throw new InvalidPointerError('Invalid array index number')
+
+            return accessor
 
 
     # Interface for patch operation classes
@@ -184,16 +198,15 @@
             value = @patch.value
 
             if isArray(reference)
-                if accessor is '-'
-                    reference.push(value)
-                else
-                    accessor = parseInt(accessor, 10)
-                    if accessor < 0 or accessor > reference.length
-                        throw new PatchConflictError("Index #{accessor} out of bounds")
-                    reference.splice(accessor, 0, value)
+                accessor = @path.coerce(reference, accessor)
+                if accessor < 0 or accessor > reference.length
+                    throw new PatchConflictError("Index #{accessor} out of bounds")
+                reference.splice(accessor, 0, value)
+            else if not accessor?
+                document = value
             else
                 reference[accessor] = value
-            return
+            return document
 
 
     class RemovePatch extends JSONPatch
@@ -202,7 +215,7 @@
             accessor = @path.accessor
 
             if isArray(reference)
-                accessor = parseInt(accessor, 10)
+                accessor = @path.coerce(reference, accessor)
                 if accessor not of reference
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 reference.splice(accessor, 1)
@@ -210,7 +223,7 @@
                 if accessor not of reference
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 delete reference[accessor]
-            return
+            return document
 
 
     class ReplacePatch extends JSONPatch
@@ -223,7 +236,7 @@
             value = @patch.value
 
             if isArray(reference)
-                accessor = parseInt(accessor, 10)
+                accessor = @path.coerce(reference, accessor)
                 if accessor not of reference
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 reference.splice(accessor, 1, value)
@@ -231,7 +244,7 @@
                 if accessor not of reference
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 reference[accessor] = value
-            return
+            return document
 
 
     class TestPatch extends JSONPatch
@@ -244,7 +257,7 @@
             value = @patch.value
 
             if isArray(reference)
-                accessor = parseInt(accessor, 10)
+                accessor = @path.coerce(reference, accessor)
             return isEqual(reference[accessor], value)
 
 
@@ -265,7 +278,7 @@
                 if @from.accessor is @path.accessor
                     # The path and to pointers reference the same location,
                     # therefore apply can be a no-op
-                    @apply = ->
+                    @apply = (document) -> document
 
         validate: (patch) ->
             if 'from' not of patch then throw new InvalidPatchError()
@@ -275,7 +288,7 @@
             accessor = @from.accessor
 
             if isArray(reference)
-                accessor = parseInt(accessor, 10)
+                accessor = @from.coerce(reference, accessor)
                 if accessor not of reference
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 value = reference.splice(accessor, 1)[0]
@@ -290,7 +303,7 @@
 
             # Add to object
             if isArray(reference)
-                accessor = parseInt(accessor, 10)
+                accessor = @path.coerce(reference, accessor)
                 if accessor < 0 or accessor > reference.length
                     throw new PatchConflictError("Index #{accessor} out of bounds")
                 reference.splice(accessor, 0, value)
@@ -298,7 +311,7 @@
                 if accessor of reference
                     throw new PatchConflictError("Value at #{accessor} exists")
                 reference[accessor] = value
-            return
+            return document
 
     
     class CopyPatch extends MovePatch
@@ -307,7 +320,7 @@
             accessor = @from.accessor
 
             if isArray(reference)
-                accessor = parseInt(accessor, 10)
+                accessor = @from.coerce(reference, accessor)
                 if accessor not of reference
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 value = reference.slice(accessor, accessor + 1)[0]
@@ -321,7 +334,7 @@
 
             # Add to object
             if isArray(reference)
-                accessor = parseInt(accessor, 10)
+                accessor = @path.coerce(reference, accessor)
                 if accessor < 0 or accessor > reference.length
                     throw new PatchConflictError("Index #{accessor} out of bounds")
                 reference.splice(accessor, 0, value)
@@ -329,7 +342,7 @@
                 if accessor of reference
                     throw new PatchConflictError("Value at #{accessor} exists")
                 reference[accessor] = value
-            return
+            return document
 
 
     # Map of operation classes
@@ -354,6 +367,7 @@
             ops.push new klass(p)
 
         return (document) ->
+            result = document
             for op in ops
                 result = op.apply(document)
             return result

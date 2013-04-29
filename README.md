@@ -1,9 +1,11 @@
-# jsonpatch.js
+# jsonpatch-js
 
 Library to apply JSON Patches in JavaScript
-http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-08
 
-jsonpatch.js works as in the browser as a script, as a Node module and as an
+- JSON Patch - http://tools.ietf.org/html/rfc6902
+- JSON Pointer - http://tools.ietf.org/html/rfc6901
+
+jsonpatch-js works as in the browser as a script, as a Node module and as an
 AMD module.
 
 ## Install
