@@ -1,5 +1,7 @@
 # jsonpatch-js
 
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/bruth/jsonpatch-js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
 Library to apply JSON Patches in JavaScript
 
 - JSON Patch - http://tools.ietf.org/html/rfc6902
