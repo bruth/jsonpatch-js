@@ -146,8 +146,8 @@
             for step in @steps
                 if isArray parent then step = parseInt(step, 10)
                 if step not of parent
-                    throw new PatchConflictError('Array location out of '
-                        'bounds or not an instance property')
+                    throw new PatchConflictError('Array location out of
+                        bounds or not an instance property')
                 parent = parent[step]
             return parent
 
@@ -313,7 +313,7 @@
                 reference[accessor] = value
             return document
 
-    
+
     class CopyPatch extends MovePatch
         apply: (document) ->
             reference = @from.getReference(document)
