@@ -1,7 +1,7 @@
 {
   "name": "json-patch",
   "author": "Byron Ruth <b@devel.io>",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A JavaScript implementation of the JSON Media Type for partial modifications: http://tools.ietf.org/html/rfc6902",
   "license": "BSD",
   "keywords": [
