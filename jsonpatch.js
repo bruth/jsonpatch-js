@@ -181,7 +181,7 @@
             step = parseInt(step, 10);
           }
           if (!(step in parent)) {
-            throw new PatchConflictError('Array location out of ', 'bounds or not an instance property');
+            throw new PatchConflictError('Array location out of bounds or not an instance property');
           }
           parent = parent[step];
         }
