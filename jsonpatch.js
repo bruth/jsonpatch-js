@@ -308,6 +308,9 @@
         reference = this.path.getReference(document);
         accessor = this.path.accessor;
         value = this.patch.value;
+        if (accessor == null) {
+          return value;
+        }
         if (isArray(reference)) {
           accessor = this.path.coerce(reference, accessor);
           if (!(accessor in reference)) {

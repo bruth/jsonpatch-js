@@ -239,6 +239,10 @@
             accessor = @path.accessor
             value = @patch.value
 
+            # Replace whole document
+            if not accessor?
+                return value
+
             if isArray(reference)
                 accessor = @path.coerce(reference, accessor)
                 if accessor not of reference
@@ -248,6 +252,7 @@
                 if accessor not of reference
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 reference[accessor] = value
+
             return document
 
 

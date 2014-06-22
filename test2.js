@@ -1,5 +1,6 @@
 // json-patch-tests
 var tests = [
+
     { "comment": "empty list, empty docs",
       "doc": {},
       "patch": [],
@@ -172,6 +173,11 @@ var tests = [
       "expected": ["foo", ["bar", "baz"]],
       "comment": "value in array replace not flattened" },
 
+    { "comment": "replace whole document",
+      "doc": {"foo": "bar"},
+      "patch": [{"op": "replace", "path": "", "value": {"baz": "qux"}}],
+      "expected": {"baz": "qux"} },
+
     { "comment": "spurious patch properties",
       "doc": {"foo": 1},
       "patch": [{"op": "test", "path": "/foo", "value": 1, "spurious": 1}],
@@ -202,8 +208,6 @@ var tests = [
       "comment": "test op should fail",
       "expected": false },
 
-    { "comment": "json-pointer tests" },
-
     { "comment": "Whole document",
       "doc": { "foo": 1 },
       "patch": [{"op": "test", "path": "", "value": {"foo": 1}}],
@@ -215,8 +219,7 @@ var tests = [
       "patch": [{"op": "test", "path": "/", "value": 1}],
       "expected": true },
 
-    { "comment": "Test wild methods",
-      "doc": {
+    { "doc": {
             "foo": ["bar", "baz"],
             "": 0,
             "a/b": 1,
@@ -273,13 +276,47 @@ var tests = [
       "patch": [ { "op": "add", "path": "/2/1/-", "value": { "foo": [ "bar", "baz" ] } } ],
       "expected": [ 1, 2, [ 3, [ 4, 5, { "foo": [ "bar", "baz" ] } ] ] ]},
 
-    { "comment": "tests complete" }
+    { "comment": "test remove with bad number should fail",
+      "doc": {"foo": 1, "baz": [{"qux": "hello"}]},
+      "patch": [{"op": "remove", "path": "/baz/1e0/qux"}],
+      "error": "remove op shouldn't remove from array with bad number" },
+
+    { "comment": "test remove on array",
+      "doc": [1, 2, 3, 4],
+      "patch": [{"op": "remove", "path": "/0"}],
+      "expected": [2, 3, 4] },
+
+    { "comment": "test remove with bad index should fail",
+      "doc": [1, 2, 3, 4],
+      "patch": [{"op": "remove", "path": "/1e0"}],
+      "error": "remove op shouldn't remove from array with bad number" },
+
+    { "comment": "test replace with bad number should fail",
+      "doc": [""],
+      "patch": [{"op": "replace", "path": "/1e0", "value": false}],
+      "error": "replace op shouldn't replace in array with bad number" },
+
+    { "comment": "test copy with bad number should fail",
+      "doc": {"baz": [1,2,3], "bar": 1},
+      "patch": [{"op": "copy", "from": "/baz/1e0", "path": "/boo"}],
+      "error": "copy op shouldn't work with bad number" },
+
+    { "comment": "test move with bad number should fail",
+      "doc": {"foo": 1, "baz": [1,2,3,4]},
+      "patch": [{"op": "move", "from": "/baz/1e0", "path": "/foo"}],
+      "error": "move op shouldn't work with bad number" },
+
+    { "comment": "test add with bad number should fail",
+      "doc": ["foo", "sil"],
+      "patch": [{"op": "add", "path": "/1e0", "value": "bar"}],
+      "error": "add op shouldn't add to array with bad number" }
 ];
+
 
 module('JSON Patch Tests');
 
 function runTest(config) {
-    test(config.comment || config.error, function() {
+    test(config.comment, function() {
         if (config.doc == null || config.disabled) {
             expect(0);
             return;
