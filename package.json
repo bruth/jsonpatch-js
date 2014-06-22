@@ -1,7 +1,7 @@
 {
   "name": "json-patch",
   "author": "Byron Ruth <b@devel.io>",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "A JavaScript implementation of the JSON Object Notation (JSON) Patch http://tools.ietf.org/html/rfc6902 and JSON Pointer http://tools.ietf.org/html/rfc6901 specifications.",
   "license": "BSD",
   "keywords": [
