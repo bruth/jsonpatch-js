@@ -15,7 +15,7 @@
       return root.jsonpatch = factory(root, {});
     }
   })(this, function(root) {
-    var AddPatch, CopyPatch, InvalidPatchError, InvalidPointerError, JSONPatch, JSONPatchError, JSONPointer, MovePatch, PatchConflictError, RemovePatch, ReplacePatch, TestPatch, apply, compile, hasOwnProperty, isArray, isEqual, isObject, isString, operationMap, toString, _isEqual;
+    var AddPatch, CopyPatch, InvalidPatchError, InvalidPointerError, JSONPatch, JSONPatchError, JSONPointer, MovePatch, PatchConflictError, RemovePatch, ReplacePatch, TestPatch, apply, compile, escapedSlash, escapedTilde, hasOwnProperty, isArray, isEqual, isObject, isString, operationMap, toString, _isEqual;
     toString = Object.prototype.toString;
     hasOwnProperty = Object.prototype.hasOwnProperty;
     isArray = function(obj) {
@@ -152,6 +152,8 @@
       return PatchConflictError;
 
     })(JSONPatchError);
+    escapedSlash = /~1/g;
+    escapedTilde = /~0/g;
     JSONPointer = (function() {
       function JSONPointer(path) {
         var i, step, steps, _i, _len;
@@ -161,7 +163,7 @@
         }
         for (i = _i = 0, _len = steps.length; _i < _len; i = ++_i) {
           step = steps[i];
-          steps[i] = step.replace('~1', '/').replace('~0', '~');
+          steps[i] = step.replace(escapedSlash, '/').replace(escapedTilde, '~');
         }
         this.accessor = steps.pop();
         this.steps = steps;

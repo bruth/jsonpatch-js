@@ -1,8 +1,8 @@
 {
   "name": "json-patch",
   "author": "Byron Ruth <b@devel.io>",
-  "version": "0.4.1",
-  "description": "A JavaScript implementation of the JSON Media Type for partial modifications: http://tools.ietf.org/html/rfc6902",
+  "version": "0.4.2",
+  "description": "A JavaScript implementation of the JSON Object Notation (JSON) Patch http://tools.ietf.org/html/rfc6902 and JSON Pointer http://tools.ietf.org/html/rfc6901 specifications.",
   "license": "BSD",
   "keywords": [
     "diff",
@@ -18,5 +18,8 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/bruth/jsonpatch-js.git"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.7.1"
   }
 }

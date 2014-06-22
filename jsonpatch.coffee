@@ -1,4 +1,4 @@
-# jsonpatch.js 0.4.1
+# jsonpatch.js 0.4.2
 # (c) 2011-2012 Byron Ruth
 # jsonpatch may be freely distributed under the BSD license
 
@@ -123,6 +123,9 @@
             @name = 'PatchConflictError'
 
 
+    escapedSlash = /~1/g
+    escapedTilde = /~0/g
+
     # Spec: http://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-05
     class JSONPointer
         constructor: (path) ->
@@ -133,7 +136,8 @@
 
             # Decode each component, decode JSON Pointer specific syntax ~0 and ~1
             for step, i in steps
-                steps[i] = step.replace('~1', '/').replace('~0', '~')
+                steps[i] = step.replace(escapedSlash, '/')
+                               .replace(escapedTilde, '~')
 
             # The final segment is the accessor (property/index) of the object
             # the pointer ultimately references
