@@ -1,4 +1,4 @@
-# jsonpatch.js 0.4.3
+# jsonpatch.js 0.4.4
 # (c) 2011-2012 Byron Ruth
 # jsonpatch may be freely distributed under the BSD license
 
