@@ -258,7 +258,8 @@
 
     class TestPatch extends JSONPatch
         validate: (patch) ->
-            if 'value' not of patch then throw new InvalidPatchError()
+            if 'value' not of patch
+                throw new InvalidPatchError("'value' member is required")
 
         apply: (document) ->
             reference = @path.getReference(document)
@@ -290,7 +291,8 @@
                     @apply = (document) -> document
 
         validate: (patch) ->
-            if 'from' not of patch then throw new InvalidPatchError()
+            if 'from' not of patch
+                throw new InvalidPatchError("'from' member is required")
 
         apply: (document) ->
             reference = @from.getReference(document)
@@ -367,18 +369,27 @@
     # Validates and compiles a patch document and returns a function to apply
     # to multiple documents
     compile = (patch) ->
+        if not isArray(patch)
+            if isObject(path)
+                patch = [patch]
+            else
+                throw new InvalidPatchError('patch must be an object or array')
+
         ops = []
 
         for p in patch
             # Not a valid operation
             if not (klass = operationMap[p.op])
-                throw new InvalidPatchError()
+                throw new InvalidPatchError('invalid operation: ' + p.op)
+
             ops.push new klass(p)
 
         return (document) ->
             result = document
+
             for op in ops
                 result = op.apply(document)
+
             return result
 
 

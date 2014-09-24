@@ -338,7 +338,7 @@
 
       TestPatch.prototype.validate = function(patch) {
         if (!('value' in patch)) {
-          throw new InvalidPatchError();
+          throw new InvalidPatchError("'value' member is required");
         }
       };
 
@@ -388,7 +388,7 @@
 
       MovePatch.prototype.validate = function(patch) {
         if (!('from' in patch)) {
-          throw new InvalidPatchError();
+          throw new InvalidPatchError("'from' member is required");
         }
       };
 
@@ -482,11 +482,18 @@
     };
     compile = function(patch) {
       var klass, ops, p, _i, _len;
+      if (!isArray(patch)) {
+        if (isObject(path)) {
+          patch = [patch];
+        } else {
+          throw new InvalidPatchError('patch must be an object or array');
+        }
+      }
       ops = [];
       for (_i = 0, _len = patch.length; _i < _len; _i++) {
         p = patch[_i];
         if (!(klass = operationMap[p.op])) {
-          throw new InvalidPatchError();
+          throw new InvalidPatchError('invalid operation: ' + p.op);
         }
         ops.push(new klass(p));
       }
