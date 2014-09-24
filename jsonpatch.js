@@ -15,7 +15,7 @@
       return root.jsonpatch = factory(root, {});
     }
   })(this, function(root) {
-    var AddPatch, CopyPatch, InvalidPatchError, InvalidPointerError, JSONPatch, JSONPatchError, JSONPointer, MovePatch, PatchConflictError, RemovePatch, ReplacePatch, TestPatch, apply, compile, escapedSlash, escapedTilde, hasOwnProperty, isArray, isEqual, isObject, isString, operationMap, toString, _isEqual;
+    var AddPatch, CopyPatch, InvalidPatchError, InvalidPointerError, JSONPatch, JSONPatchError, JSONPointer, MovePatch, PatchConflictError, PatchTestFailed, RemovePatch, ReplacePatch, TestPatch, apply, compile, escapedSlash, escapedTilde, hasOwnProperty, isArray, isEqual, isObject, isString, operationMap, toString, _isEqual;
     toString = Object.prototype.toString;
     hasOwnProperty = Object.prototype.hasOwnProperty;
     isArray = function(obj) {
@@ -152,6 +152,17 @@
       return PatchConflictError;
 
     })(JSONPatchError);
+    PatchTestFailed = (function(_super) {
+      __extends(PatchTestFailed, _super);
+
+      function PatchTestFailed(message) {
+        this.message = message != null ? message : 'Patch test failed';
+        this.name = 'PatchTestFailed';
+      }
+
+      return PatchTestFailed;
+
+    })(Error);
     escapedSlash = /~1/g;
     escapedTilde = /~0/g;
     JSONPointer = (function() {
@@ -350,7 +361,10 @@
         if (isArray(reference)) {
           accessor = this.path.coerce(reference, accessor);
         }
-        return isEqual(reference[accessor], value);
+        if (!isEqual(reference[accessor], value)) {
+          throw new PatchTestFailed();
+        }
+        return document;
       };
 
       return TestPatch;
@@ -518,6 +532,7 @@
     root.InvalidPointerError = InvalidPointerError;
     root.InvalidPatchError = InvalidPatchError;
     root.PatchConflictError = PatchConflictError;
+    root.PatchTestFailed = PatchTestFailed;
     return root;
   });
 

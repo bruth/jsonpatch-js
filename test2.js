@@ -116,7 +116,7 @@ var tests = [
     { "comment": "test against implementation-specific numeric parsing",
       "doc": {"1e0": "foo"},
       "patch": [{"op": "test", "path": "/1e0", "value": "foo"}],
-      "expected": true },
+      "test": true },
 
     { "comment": "test with bad number should fail",
       "doc": ["foo", "bar"],
@@ -181,32 +181,32 @@ var tests = [
     { "comment": "spurious patch properties",
       "doc": {"foo": 1},
       "patch": [{"op": "test", "path": "/foo", "value": 1, "spurious": 1}],
-      "expected": true },
+      "test": true },
 
     { "doc": {"foo": null},
       "patch": [{"op": "test", "path": "/foo", "value": null}],
       "comment": "null value should still be valid obj property",
-      "expected": true },
+      "test": true },
 
     { "doc": {"foo": {"foo": 1, "bar": 2}},
       "patch": [{"op": "test", "path": "/foo", "value": {"bar": 2, "foo": 1}}],
       "comment": "test should pass despite rearrangement",
-      "expected": true },
+      "test": true },
 
     { "doc": {"foo": [{"foo": 1, "bar": 2}]},
       "patch": [{"op": "test", "path": "/foo", "value": [{"bar": 2, "foo": 1}]}],
       "comment": "test should pass despite (nested) rearrangement",
-      "expected": true },
+      "test": true },
 
     { "doc": {"foo": {"bar": [1, 2, 5, 4]}},
       "patch": [{"op": "test", "path": "/foo", "value": {"bar": [1, 2, 5, 4]}}],
       "comment": "test should pass - no error",
-      "expected": true },
+      "test": true },
 
     { "doc": {"foo": {"bar": [1, 2, 5, 4]}},
       "patch": [{"op": "test", "path": "/foo", "value": [1, 2]}],
       "comment": "test op should fail",
-      "expected": false },
+      "error": "patch test fail" },
 
     { "comment": "Whole document",
       "doc": { "foo": 1 },
@@ -217,7 +217,7 @@ var tests = [
     { "comment": "Empty-string element",
       "doc": { "": 1 },
       "patch": [{"op": "test", "path": "/", "value": 1}],
-      "expected": true },
+      "test": true },
 
     { "doc": {
             "foo": ["bar", "baz"],
@@ -242,7 +242,7 @@ var tests = [
                 {"op": "test", "path": "/k\"l", "value": 6},
                 {"op": "test", "path": "/ ", "value": 7},
                 {"op": "test", "path": "/m~0n", "value": 8}],
-      "expected": true },
+      "test": true },
 
     { "comment": "Move to same location has no effect",
       "doc": {"foo": 1},
@@ -326,6 +326,9 @@ function runTest(config) {
             raises(function() {
                 jsonpatch.apply(config.doc, config.patch);
             });
+        } else if (config.test) {
+            output = jsonpatch.apply(config.doc, config.patch);
+            deepEqual(output, config.doc);
         } else {
             output = jsonpatch.apply(config.doc, config.patch);
             deepEqual(output, config.expected);

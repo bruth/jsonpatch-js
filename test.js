@@ -71,8 +71,10 @@ test('replace', function() {
 
 test('test', function() {
     obj = {foo: {bar: [1, 2, 5, 4]}};
-    ok(jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: {bar: [1, 2, 5, 4]}}]));
-    ok(!jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: [1, 2]}]));
+    deepEqual(obj, jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: {bar: [1, 2, 5, 4]}}]));
+    raises(function() {
+        jsonpatch.apply(obj, [{op: 'test', path: '/foo', value: [1, 2]}]);
+    }, jsonpatch.PatchTestFailed);
 });
 
 
@@ -97,7 +99,7 @@ test('copy', function() {
     deepEqual(obj, {foo: 1, baz: [{qux: 'hello'}, 'hello'], bar: 1});
 });
 
-   
+
 
 // JSLitmus
 JSLitmus.test('Add Operation', function() {

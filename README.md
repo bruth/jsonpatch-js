@@ -110,6 +110,10 @@ Patch syntax: `{op: 'test', path: <path>, value: <value>}`
 jsonpatch.apply({foo: 'bar'}, [{op: 'test', path: '/foo', value: 'bar'}]
 ```
 
+*Changed in 0.5.0*
+
+The return value is no longer a boolean, but now the the document itself which adheres correctly to the specification. It the test fails, a `PatchTestFailed` error will be thrown.
+
 ## Error Types
 
 **`JSONPatchError`**
@@ -127,3 +131,7 @@ Thrown when the patch itself has an invalid syntax.
 **`PatchConflictError`**
 
 Thrown when there is a conflic with applying the patch to the document.
+
+**`PatchTestFailed`**
+
+Thrown when a test operation is applied and fails.

@@ -122,6 +122,10 @@
         constructor: (@message='Patch conflict') ->
             @name = 'PatchConflictError'
 
+    class PatchTestFailed extends Error
+        constructor: (@message='Patch test failed') ->
+            @name = 'PatchTestFailed'
+
 
     escapedSlash = /~1/g
     escapedTilde = /~0/g
@@ -268,7 +272,11 @@
 
             if isArray(reference)
                 accessor = @path.coerce(reference, accessor)
-            return isEqual(reference[accessor], value)
+
+            if not isEqual(reference[accessor], value)
+                throw new PatchTestFailed()
+
+            return document
 
 
     class MovePatch extends JSONPatch
@@ -407,5 +415,6 @@
     root.InvalidPointerError = InvalidPointerError
     root.InvalidPatchError = InvalidPatchError
     root.PatchConflictError = PatchConflictError
+    root.PatchTestFailed = PatchTestFailed
 
     return root
