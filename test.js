@@ -66,6 +66,9 @@ test('replace', function() {
 
     jsonpatch.apply(obj, [{op: 'replace', path: '/baz/0/qux', value: 'world'}]);
     deepEqual(obj, {foo: [1, 2, 3, 4], baz: [{qux: 'world'}]});
+
+    jsonpatch.apply(obj, [{op: 'replace', path: '/foo/-', value: 42}]);
+    deepEqual(obj, {foo: [1, 2, 3, 42], baz: [{qux: 'world'}]});
 });
 
 

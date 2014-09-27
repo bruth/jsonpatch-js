@@ -249,6 +249,8 @@
 
             if isArray(reference)
                 accessor = @path.coerce(reference, accessor)
+                if @path.accessor is '-'
+                    accessor--;
                 if accessor not of reference
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 reference.splice(accessor, 1, value)
