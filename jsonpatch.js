@@ -324,6 +324,11 @@
         }
         if (isArray(reference)) {
           accessor = this.path.coerce(reference, accessor);
+
+          if (this.path.accessor === '-') {
+            accessor--;
+          }
+
           if (!(accessor in reference)) {
             throw new PatchConflictError("Value at " + accessor + " does not exist");
           }
