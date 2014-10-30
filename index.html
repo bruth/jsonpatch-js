@@ -5,9 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -21,14 +21,15 @@
       <div class="inner">
         <h1>jsonpatch-js</h1>
         <h2>A JavaScript implementation of the JSON Media Type for partial modifications</h2>
-        <a href="https://github.com/bruth/jsonpatch-js" class="button"><small>View project on</small>GitHub</a>
+        <a href="https://github.com/bruth/jsonpatch-js" class="button"><small>View project on</small> GitHub</a>
       </div>
     </header>
 
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h1>JSON Patch for JavaScript</h1>
+          <h1>
+<a name="json-patch-for-javascript" class="anchor" href="#json-patch-for-javascript"><span class="octicon octicon-link"></span></a>JSON Patch for JavaScript</h1>
 
 <p>Library to apply JSON Patches in JavaScript</p>
 
@@ -37,10 +38,13 @@
 </li>
 <li>JSON Pointer - <a href="http://tools.ietf.org/html/rfc6901">http://tools.ietf.org/html/rfc6901</a>
 </li>
-</ul><p>jsonpatch-js works as in the browser as a script, as a Node module and as an
+</ul>
+
+<p>jsonpatch-js works as in the browser as a script, as a Node module and as an
 AMD module.</p>
 
-<h2>Install</h2>
+<h2>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h2>
 
 <p><strong>Bower</strong></p>
 
@@ -54,7 +58,8 @@ AMD module.</p>
 
 <p><strong>Note: at this time, all operations are applied in-place.</strong></p>
 
-<h2>Methods</h2>
+<h2>
+<a name="methods" class="anchor" href="#methods"><span class="octicon octicon-link"></span></a>Methods</h2>
 
 <p><strong><code>jsonpatch.apply(document, patch)</code></strong></p>
 
@@ -64,13 +69,15 @@ AMD module.</p>
 
 <p>Compiles a patch and returns a function that takes a document to apply the patch to.</p>
 
-<h2>Patch Operations</h2>
+<h2>
+<a name="patch-operations" class="anchor" href="#patch-operations"><span class="octicon octicon-link"></span></a>Patch Operations</h2>
 
-<h3>Add</h3>
+<h3>
+<a name="add" class="anchor" href="#add"><span class="octicon octicon-link"></span></a>Add</h3>
 
 <p>Patch syntax: <code>{op: 'add', path: &lt;path&gt;, value: &lt;value&gt;}</code></p>
 
-<div class="highlight"><pre><span class="c1">// Add property, result: {foo: 'bar'}</span>
+<div class="highlight highlight-javascript"><pre><span class="c1">// Add property, result: {foo: 'bar'}</span>
 <span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'add'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">}]);</span>
 
 <span class="c1">// Add array element, result: {foo: [1, 2, 3]}</span>
@@ -80,11 +87,12 @@ AMD module.</p>
 <span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{}]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'add'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]);</span>
 </pre></div>
 
-<h3>Remove</h3>
+<h3>
+<a name="remove" class="anchor" href="#remove"><span class="octicon octicon-link"></span></a>Remove</h3>
 
 <p>Patch syntax: <code>{op: 'remove', path: &lt;path&gt;}</code></p>
 
-<div class="highlight"><pre><span class="c1">// Remove property, result: {}</span>
+<div class="highlight highlight-javascript"><pre><span class="c1">// Remove property, result: {}</span>
 <span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'remove'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">}]);</span>
 
 <span class="c1">// Remove array element, result: {foo: [1, 3]}</span>
@@ -94,11 +102,12 @@ AMD module.</p>
 <span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{</span><span class="nx">bar</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'remove'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">}]);</span>
 </pre></div>
 
-<h3>Replace</h3>
+<h3>
+<a name="replace" class="anchor" href="#replace"><span class="octicon octicon-link"></span></a>Replace</h3>
 
 <p>Patch syntax: <code>{op: 'replace', path: &lt;path&gt;, value: &lt;value&gt;}</code></p>
 
-<div class="highlight"><pre><span class="c1">// Replace property, result: {foo: 1}</span>
+<div class="highlight highlight-javascript"><pre><span class="c1">// Replace property, result: {foo: 1}</span>
 <span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'replace'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">1</span><span class="p">}]);</span>
 
 <span class="c1">// Repalce array element, result: {foo: [1, 4, 3]}</span>
@@ -108,31 +117,39 @@ AMD module.</p>
 <span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[{</span><span class="nx">bar</span><span class="o">:</span> <span class="s1">'baz'</span><span class="p">}]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'replace'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo/0/bar'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="mi">1</span><span class="p">}]);</span>
 </pre></div>
 
-<h3>Move</h3>
+<h3>
+<a name="move" class="anchor" href="#move"><span class="octicon octicon-link"></span></a>Move</h3>
 
 <p>Patch syntax: <code>{op: 'move', from: &lt;path&gt;, path: &lt;path&gt;}</code></p>
 
-<div class="highlight"><pre><span class="c1">// Move property, result {bar: [1, 2, 3]}</span>
+<div class="highlight highlight-javascript"><pre><span class="c1">// Move property, result {bar: [1, 2, 3]}</span>
 <span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'move'</span><span class="p">,</span> <span class="nx">from</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/bar'</span><span class="p">}]);</span>
 </pre></div>
 
-<h3>Copy</h3>
+<h3>
+<a name="copy" class="anchor" href="#copy"><span class="octicon octicon-link"></span></a>Copy</h3>
 
 <p>Patch syntax: <code>{op: 'copy', from: &lt;path&gt;, path: &lt;path&gt;}</code></p>
 
-<div class="highlight"><pre><span class="c1">// Copy property, result {foo: [1, 2, 3], bar: 2}</span>
+<div class="highlight highlight-javascript"><pre><span class="c1">// Copy property, result {foo: [1, 2, 3], bar: 2}</span>
 <span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'copy'</span><span class="p">,</span> <span class="nx">from</span><span class="o">:</span> <span class="s1">'/foo/1'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/bar'</span><span class="p">}]);</span>
 </pre></div>
 
-<h3>Test</h3>
+<h3>
+<a name="test" class="anchor" href="#test"><span class="octicon octicon-link"></span></a>Test</h3>
 
 <p>Patch syntax: <code>{op: 'test', path: &lt;path&gt;, value: &lt;value&gt;}</code></p>
 
-<div class="highlight"><pre><span class="c1">// Test equality of property to value, result: true</span>
+<div class="highlight highlight-javascript"><pre><span class="c1">// Test equality of property to value, result: true</span>
 <span class="nx">jsonpatch</span><span class="p">.</span><span class="nx">apply</span><span class="p">({</span><span class="nx">foo</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">},</span> <span class="p">[{</span><span class="nx">op</span><span class="o">:</span> <span class="s1">'test'</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">'/foo'</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s1">'bar'</span><span class="p">}]</span>
 </pre></div>
 
-<h2>Error Types</h2>
+<p><em>Changed in 0.5.0</em></p>
+
+<p>The return value is no longer a boolean, but now the the document itself which adheres correctly to the specification. It the test fails, a <code>PatchTestFailed</code> error will be thrown.</p>
+
+<h2>
+<a name="error-types" class="anchor" href="#error-types"><span class="octicon octicon-link"></span></a>Error Types</h2>
 
 <p><strong><code>JSONPatchError</code></strong></p>
 
@@ -149,6 +166,10 @@ AMD module.</p>
 <p><strong><code>PatchConflictError</code></strong></p>
 
 <p>Thrown when there is a conflic with applying the patch to the document.</p>
+
+<p><strong><code>PatchTestFailed</code></strong></p>
+
+<p>Thrown when a test operation is applied and fails.</p>
         </section>
 
         <aside id="sidebar">
@@ -163,7 +184,7 @@ AMD module.</p>
 
           <p class="repo-owner"><a href="https://github.com/bruth/jsonpatch-js"></a> is maintained by <a href="https://github.com/bruth">bruth</a>.</p>
 
-          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
         </aside>
       </div>
     </div>
