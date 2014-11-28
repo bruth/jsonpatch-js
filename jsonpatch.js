@@ -497,7 +497,7 @@
     compile = function(patch) {
       var klass, ops, p, _i, _len;
       if (!isArray(patch)) {
-        if (isObject(path)) {
+        if (isObject(patch)) {
           patch = [patch];
         } else {
           throw new InvalidPatchError('patch must be an object or array');

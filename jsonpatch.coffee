@@ -378,7 +378,7 @@
     # to multiple documents
     compile = (patch) ->
         if not isArray(patch)
-            if isObject(path)
+            if isObject(patch)
                 patch = [patch]
             else
                 throw new InvalidPatchError('patch must be an object or array')
