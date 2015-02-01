@@ -76,7 +76,7 @@ Patch syntax: `{op: 'replace', path: <path>, value: <value>}`
 // Replace property, result: {foo: 1}
 jsonpatch.apply({foo: 'bar'}, [{op: 'replace', path: '/foo', value: 1}]);
 
-// Repalce array element, result: {foo: [1, 4, 3]}
+// Replace array element, result: {foo: [1, 4, 3]}
 jsonpatch.apply({foo: [1, 2, 3]}, [{op: 'replace', path: '/foo/1', value: 4}]);
 
 // Complex, result: {foo: [{bar: 1}]}
