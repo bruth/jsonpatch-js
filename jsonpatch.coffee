@@ -1,5 +1,5 @@
-# jsonpatch.js 0.5.0
-# (c) 2011-2012 Byron Ruth
+# jsonpatch.js 0.6.0
+# (c) 2011-2016 Byron Ruth
 # jsonpatch may be freely distributed under the BSD license
 
 ((root, factory) ->
@@ -396,7 +396,7 @@
             result = document
 
             for op in ops
-                result = op.apply(document)
+                result = op.apply(result)
 
             return result
 
