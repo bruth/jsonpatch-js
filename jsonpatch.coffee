@@ -224,7 +224,7 @@
 
             if isArray(reference)
                 accessor = @path.coerce(reference, accessor)
-                if accessor not of reference
+                if accessor >= reference.length
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 reference.splice(accessor, 1)
             else
@@ -249,7 +249,7 @@
 
             if isArray(reference)
                 accessor = @path.coerce(reference, accessor)
-                if accessor not of reference
+                if accessor >= reference.length
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 reference.splice(accessor, 1, value)
             else
@@ -308,7 +308,7 @@
 
             if isArray(reference)
                 accessor = @from.coerce(reference, accessor)
-                if accessor not of reference
+                if accessor >= reference.length
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 value = reference.splice(accessor, 1)[0]
             else
@@ -340,7 +340,7 @@
 
             if isArray(reference)
                 accessor = @from.coerce(reference, accessor)
-                if accessor not of reference
+                if accessor >= reference.length
                     throw new PatchConflictError("Value at #{accessor} does not exist")
                 value = reference.slice(accessor, accessor + 1)[0]
             else
