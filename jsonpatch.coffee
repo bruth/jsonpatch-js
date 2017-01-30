@@ -1,5 +1,5 @@
-# jsonpatch.js 0.6.0
-# (c) 2011-2016 Byron Ruth
+# jsonpatch.js 0.6.1
+# (c) 2011-2017 Byron Ruth
 # jsonpatch may be freely distributed under the BSD license
 
 ((root, factory) ->
@@ -407,6 +407,7 @@
 
 
     # Export to root
+    root.version = '0.6.1'
     root.apply = apply
     root.compile = compile
     root.JSONPointer = JSONPointer
