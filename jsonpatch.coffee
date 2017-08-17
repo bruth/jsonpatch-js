@@ -14,7 +14,7 @@
     else
         # Browser globals
         root.jsonpatch = factory({})
-) (root) ->
+) (exports) ->
 
     # Utilities
     toString = Object.prototype.toString
@@ -130,6 +130,7 @@
 
     escapedSlash = /~1/g
     escapedTilde = /~0/g
+    accessorMatch = /^[-+]?\d+$/
 
     # Spec: http://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-05
     class JSONPointer
@@ -167,7 +168,7 @@
                 if isString(accessor)
                     if accessor is '-'
                         accessor = reference.length
-                    else if /^[-+]?\d+$/.test(accessor)
+                    else if accessorMatch.test(accessor)
                         accessor = parseInt(accessor, 10)
                     else
                         throw new InvalidPointerError('Invalid array index number')
@@ -338,7 +339,6 @@
         apply: (document) ->
             reference = @from.getReference(document)
             accessor = @from.accessor
-
             if isArray(reference)
                 accessor = @from.coerce(reference, accessor)
                 if accessor >= reference.length
@@ -407,16 +407,16 @@
         compile(patch)(document)
 
 
-    # Export to root
-    root.version = '0.6.1'
-    root.apply = apply
-    root.compile = compile
-    root.JSONPointer = JSONPointer
-    root.JSONPatch = JSONPatch
-    root.JSONPatchError = JSONPatchError
-    root.InvalidPointerError = InvalidPointerError
-    root.InvalidPatchError = InvalidPatchError
-    root.PatchConflictError = PatchConflictError
-    root.PatchTestFailed = PatchTestFailed
+    # Export to exports
+    exports.version = '0.6.1'
+    exports.apply = apply
+    exports.compile = compile
+    exports.JSONPointer = JSONPointer
+    exports.JSONPatch = JSONPatch
+    exports.JSONPatchError = JSONPatchError
+    exports.InvalidPointerError = InvalidPointerError
+    exports.InvalidPatchError = InvalidPatchError
+    exports.PatchConflictError = PatchConflictError
+    exports.PatchTestFailed = PatchTestFailed
 
-    return root
+    return exports

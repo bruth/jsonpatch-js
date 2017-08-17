@@ -16,8 +16,8 @@
     } else {
       return root.jsonpatch = factory({});
     }
-  })(function(root) {
-    var AddPatch, CopyPatch, InvalidPatchError, InvalidPointerError, JSONPatch, JSONPatchError, JSONPointer, MovePatch, PatchConflictError, PatchTestFailed, RemovePatch, ReplacePatch, TestPatch, _isEqual, apply, compile, escapedSlash, escapedTilde, hasOwnProperty, isArray, isEqual, isObject, isString, operationMap, toString;
+  })(function(exports) {
+    var AddPatch, CopyPatch, InvalidPatchError, InvalidPointerError, JSONPatch, JSONPatchError, JSONPointer, MovePatch, PatchConflictError, PatchTestFailed, RemovePatch, ReplacePatch, TestPatch, _isEqual, accessorMatch, apply, compile, escapedSlash, escapedTilde, hasOwnProperty, isArray, isEqual, isObject, isString, operationMap, toString;
     toString = Object.prototype.toString;
     hasOwnProperty = Object.prototype.hasOwnProperty;
     isArray = function(obj) {
@@ -167,6 +167,7 @@
     })(Error);
     escapedSlash = /~1/g;
     escapedTilde = /~0/g;
+    accessorMatch = /^[-+]?\d+$/;
     JSONPointer = (function() {
       function JSONPointer(path) {
         var i, j, len1, step, steps;
@@ -204,7 +205,7 @@
           if (isString(accessor)) {
             if (accessor === '-') {
               accessor = reference.length;
-            } else if (/^[-+]?\d+$/.test(accessor)) {
+            } else if (accessorMatch.test(accessor)) {
               accessor = parseInt(accessor, 10);
             } else {
               throw new InvalidPointerError('Invalid array index number');
@@ -526,17 +527,17 @@
     apply = function(document, patch) {
       return compile(patch)(document);
     };
-    root.version = '0.6.1';
-    root.apply = apply;
-    root.compile = compile;
-    root.JSONPointer = JSONPointer;
-    root.JSONPatch = JSONPatch;
-    root.JSONPatchError = JSONPatchError;
-    root.InvalidPointerError = InvalidPointerError;
-    root.InvalidPatchError = InvalidPatchError;
-    root.PatchConflictError = PatchConflictError;
-    root.PatchTestFailed = PatchTestFailed;
-    return root;
+    exports.version = '0.6.1';
+    exports.apply = apply;
+    exports.compile = compile;
+    exports.JSONPointer = JSONPointer;
+    exports.JSONPatch = JSONPatch;
+    exports.JSONPatchError = JSONPatchError;
+    exports.InvalidPointerError = InvalidPointerError;
+    exports.InvalidPatchError = InvalidPatchError;
+    exports.PatchConflictError = PatchConflictError;
+    exports.PatchTestFailed = PatchTestFailed;
+    return exports;
   });
 
 }).call(this);
