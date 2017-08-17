@@ -2,18 +2,19 @@
 # (c) 2011-2017 Byron Ruth
 # jsonpatch may be freely distributed under the BSD license
 
-((root, factory) ->
+((factory) ->
+    root = if window? then window else if global? then global else @;
     if typeof exports isnt 'undefined'
         # Node/CommonJS
-        factory(root, exports)
+        factory(exports)
     else if typeof define is 'function' and define.amd
         # AMD
         define ['exports'], (exports) ->
-            root.jsonpatch = factory(root, exports)
+            root.jsonpatch = factory(exports)
     else
         # Browser globals
-        root.jsonpatch = factory(root, {})
-) @, (root) ->
+        root.jsonpatch = factory({})
+) (root) ->
 
     # Utilities
     toString = Object.prototype.toString
