@@ -527,7 +527,7 @@
     apply = function(document, patch) {
       return compile(patch)(document);
     };
-    exports.version = '0.6.1';
+    exports.version = '0.7.0';
     exports.apply = apply;
     exports.compile = compile;
     exports.JSONPointer = JSONPointer;
