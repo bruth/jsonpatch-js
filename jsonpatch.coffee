@@ -3,6 +3,7 @@
 # jsonpatch may be freely distributed under the BSD license
 
 ((factory) ->
+    # Detect global object for browser, node, and worker
     root = if window? then window else if global? then global else @;
     if typeof exports isnt 'undefined'
         # Node/CommonJS
